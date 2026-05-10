@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Enigmas do Asilo - Edição Noir</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <style>
+        /* === PALETA ULTRA PREMIUM === */
+        :root {
+            --bg-dark: #070709;
+            --blood-red: #6e0b14;
+            --gold-bright: #e6c27a;
+            --gold-dark: #997330;
+            --paper-front: #f4ebd8;
+            --paper-back: #1f1b18;
+            --ink: #1a1412;
+            --ink-light: #4a3b32;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--gold-bright);
+            font-family: 'Cormorant Garamond', serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 40%, #1f1113 0%, var(--bg-dark) 80%);
+        }
+
+        /* PARTICULAS DE POEIRA DOURADA (FRUFRU) */
+        .particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle {
+            position: absolute; background: var(--gold-bright); border-radius: 50%;
+            opacity: 0; animation: floatParticle linear infinite;
+            box-shadow: 0 0 8px var(--gold-bright);
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        #app {
+            width: 100%; max-width: 420px; height: 100vh;
+            display: flex; flex-direction: column; padding: 30px 20px;
+            position: relative; z-index: 10;
+        }
+
+        /* HEADER ANIMADO */
+        header { text-align: center; margin-bottom: 20px; animation: slideDown 1s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gold-bright); letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 4px 15px rgba(230, 194, 122, 0.4); }
+        .subtitle { color: #888; font-size: 14px; font-style: italic; margin-top: 5px; }
+
+        /* === CENA 3D E CARTA FLUTUANTE === */
+        .card-scene {
+            flex: 1; width: 100%; perspective: 1500px;
+            display: flex; justify-content: center; align-items: center;
+            animation: floatingCard 6s ease-in-out infinite;
+        }
+        @keyframes floatingCard {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .card {
+            width: 100%; height: 95%; max-height: 550px;
+            position: relative; transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px rgba(110, 11, 20, 0.2);
+            border-radius: 12px;
+        }
+        .card.is-flipped { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 12px;
+            padding: 35px 25px; display: flex; flex-direction: column; align-items: center;
+            overflow: hidden;
+        }
+
+        /* EFEITO SHIMMER (BRILHO PASSANDO NA CARTA) */
+        .card-face::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(30deg); animation: shimmer 4s infinite linear; pointer-events: none;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%) rotate(30deg); } 100% { transform: translateX(100%) rotate(30deg); } }
+
+        /* FRENTE (MISTÉRIO) */
+        .card-front {
+            background-color: var(--paper-front); color: var(--ink);
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            border: 2px solid var(--ink-light);
+            border-image: repeating-linear-gradient(45deg, var(--ink), var(--ink) 10px, transparent 10px, transparent 20px) 1;
+        }
+        .badge-front { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; color: white; background: var(--blood-red); padding: 5px 15px; letter-spacing: 2px; border-radius: 20px; box-shadow: 0 4px 10px rgba(110,11,20,0.4); margin-bottom: 20px; }
+
+        /* VERSO (SOLUÇÃO) */
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: var(--paper-back); color: var(--gold-bright);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            border: 2px solid var(--gold-dark);
+        }
+        .badge-back { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; color: var(--paper-back); background: var(--gold-bright); padding: 5px 15px; letter-spacing: 2px; border-radius: 20px; box-shadow: 0 4px 10px rgba(230,194,122,0.3); margin-bottom: 20px; }
+
+        /* TIPOGRAFIA INTERNA */
+        .story-title { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; text-align: center; margin-bottom: 20px; text-transform: uppercase; line-height: 1.2; }
+        .card-front .story-title { color: var(--blood-red); border-bottom: 2px solid rgba(110,11,20,0.2); padding-bottom: 15px; width: 100%; }
+        .card-back .story-title { color: var(--gold-bright); border-bottom: 2px solid rgba(230,194,122,0.2); padding-bottom: 15px; width: 100%; }
+        
+        .story-text { font-size: 20px; line-height: 1.5; text-align: justify; flex: 1; overflow-y: auto; padding-right: 5px; font-weight: bold; }
+        
+        .instruction { font-family: 'Cinzel', serif; font-size: 11px; font-weight: bold; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; text-align: center; }
+
+        /* BOTÃO LUXUOSO */
+        .controls { display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px; animation: slideUp 1s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .btn-random {
+            width: 100%; padding: 20px; border-radius: 8px; border: none;
+            background: linear-gradient(135deg, var(--blood-red) 0%, #3a0409 100%);
+            color: var(--gold-bright); font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 4px; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(110,11,20,0.6), inset 0 2px 5px rgba(255,255,255,0.2);
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .btn-random:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(110,11,20,0.6); }
+        .btn-random::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(30deg); transition: all 0.5s; opacity: 0;
+        }
+        .btn-random:active::after { opacity: 1; transform: translateX(100%) rotate(30deg); transition: 0s; }
+
+        /* EFEITO DE EMBARALHAMENTO (GLITCH DE TEXTO) */
+        .shuffling { filter: blur(2px); opacity: 0.7; transform: scale(0.95); transition: all 0.1s; }
+
+        /* SCROLLBAR CUSTOMIZADA */
+        .story-text::-webkit-scrollbar { width: 3px; }
+        .story-text::-webkit-scrollbar-track { background: transparent; }
+        .story-text::-webkit-scrollbar-thumb { background: rgba(110,11,20,0.3); border-radius: 4px; }
+        .card-back .story-text::-webkit-scrollbar-thumb { background: rgba(230,194,122,0.3); }
+    </style>
+</head>
+<body>
+
+<div class="particles" id="particles-container"></div>
+
+<div id="app">
+    <header>
+        <h1>Arquivos do Asilo</h1>
+        <div class="subtitle">Casos para dedução. Responda apenas Sim, Não ou Irrelevante.</div>
+    </header>
+
+    <div class="card-scene">
+        <div class="card" id="mystery-card" onclick="flipCard()">
+            <div class="card-face card-front">
+                <div class="badge-front" id="case-number">CASO #01</div>
+                <h2 class="story-title" id="front-title">Título</h2>
+                <div class="story-text" id="front-text">Texto do enigma...</div>
+                <div class="instruction">Toque para revelar a solução</div>
+            </div>
+            <div class="card-face card-back">
+                <div class="badge-back">A VERDADE</div>
+                <h2 class="story-title" id="back-title">Solução</h2>
+                <div class="story-text" id="back-text">Texto da solução...</div>
+                <div class="instruction">Toque para esconder</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-random" onclick="pickRandomCard()">Sorteie um Mistério</button>
+    </div>
+</div>
+
+<script>
+    // === GERAÇÃO DAS PARTÍCULAS ===
+    const pContainer = document.getElementById('particles-container');
+    for(let i=0; i<30; i++){
+        let p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.width = Math.random() * 4 + 1 + 'px';
+        p.style.height = p.style.width;
+        p.style.animationDuration = Math.random() * 4 + 4 + 's';
+        p.style.animationDelay = Math.random() * 5 + 's';
+        pContainer.appendChild(p);
+    }
+
+    // === 15 HISTÓRIAS ÉPICAS (MERGE DE CLÁSSICOS + TEMA) ===
+    const database = [
+        { // Clássico adaptado (Soluço)
+            title: "O Pinguço Vingativo",
+            enigma: "Um velho entrou no bar do cassino e pediu um copo de água ao barman. O barman sacou um revólver calibre 38 e apontou para a cabeça do velho. O velho sorriu, agradeceu e foi embora sem beber a água.",
+            solution: "O velho estava com uma crise terrível de soluço. O barman percebeu isso e sacou a arma para dar um grande susto nele. O susto curou o soluço instantaneamente. Ele agradeceu a 'cura' e saiu."
+        },
+        { // Clássico adaptado (Gelo)
+            title: "A Poça Misteriosa",
+            enigma: "Um mafioso foi encontrado morto, enforcado no teto de uma sala vazia e trancada por dentro. Não havia cadeiras, mesas ou móveis na sala. Abaixo do corpo, havia apenas uma grande poça de água.",
+            solution: "Ele subiu em cima de um grande bloco de gelo para colocar a corda no pescoço. Quando o gelo derreteu, ele morreu enforcado, deixando apenas a poça de água."
+        },
+        { // Clássico Lateral (Monopoly)
+            title: "A Falência na Mesa",
+            enigma: "Um homem empurrou seu carro até um hotel. Assim que chegou lá, percebeu que havia perdido todo o seu dinheiro e estava completamente falido.",
+            solution: "Ele não estava dirigindo um carro de verdade. Ele estava jogando Banco Imobiliário (Monopoly). A pecinha dele era o carro, e ele caiu no hotel de outro jogador, pagando aluguel e indo à falência."
+        },
+        { // Tema (O clássico da Sopa de Gaivota adaptado para guerra)
+            title: "A Sopa de Gaivota",
+            enigma: "O veterano de guerra entrou num restaurante e pediu sopa de gaivota. Ao dar a primeira colherada, ele largou o prato, foi ao banheiro e deu um tiro na própria cabeça.",
+            solution: "Na guerra, ele e seu batalhão ficaram presos numa ilha. Disseram-lhe que sua esposa (que estava na viagem) havia morrido de fome e lhe serviram 'sopa de gaivota' para sobreviver. Ao provar a sopa real no restaurante, viu que o gosto era diferente e percebeu que, na ilha, ele havia comido a própria esposa."
+        },
+        { // Clássico Lateral (Peixe / Vidro)
+            title: "O Tamanho do Peixe",
+            enigma: "Dona Maria foi encontrada morta dentro de uma cabine telefônica com os pulsos cortados. Os vidros da cabine estavam quebrados e não havia assassino.",
+            solution: "Ela estava ligando para uma amiga para contar o tamanho do peixe gigante que havia pescado. Ao tentar demonstrar o tamanho com as mãos, ela socou os vidros da cabine, cortando os pulsos e morrendo de hemorragia."
+        },
+        { // Lateral / Tema (Romeu e Julieta Peixes)
+            title: "Tragédia no Quarto 12",
+            enigma: "Romeu e Julieta foram encontrados mortos no chão do quarto do asilo. Havia cacos de vidro e água ao redor de seus corpos. A janela estava aberta.",
+            solution: "Romeu e Julieta eram dois peixes dourados. Um gato pulou pela janela aberta e derrubou o aquário de vidro, quebrando-o no chão. Os peixes morreram sem água."
+        },
+        { // Clássico Lateral (Paraquedas)
+            title: "O Pacote Fechado",
+            enigma: "Um idoso foi encontrado morto no meio de um campo aberto, longe de qualquer estrada. Ao lado do corpo dele, havia um pacote que nunca foi aberto.",
+            solution: "O pacote era um paraquedas que falhou. Ele tentou saltar de um avião para realizar um sonho de juventude, o paraquedas não abriu e ele morreu com o impacto."
+        },
+        { // Tema (O cego falso)
+            title: "O Cego Milagroso",
+            enigma: "O velho cego estava jogando poker. De repente, a força acabou e o salão ficou num breu total. O homem largou a bengala e saiu correndo perfeitamente até a rua, desviando de todas as mesas no escuro.",
+            solution: "Ele nunca foi cego. Ele usava óculos escuros para poder espiar as cartas dos adversários. Quando a luz apagou, o salão ficou escuro para todos, mas ele achou que tinha ficado cego de verdade e correu em pânico."
+        },
+        { // Clássico Lateral (Anão do Circo / Bengala)
+            title: "A Bengala Serrada",
+            enigma: "O velho entrou em seu quarto, encontrou pó de serra no chão e, logo em seguida, sacou uma arma e se matou, chorando de desespero.",
+            solution: "O velho era um anão cego que se exibia num circo como 'o menor homem do mundo'. Um rival serrou a ponta da sua bengala. Ao tatear o chão e ver que a bengala não batia, o cego achou que estava crescendo e perdendo seu meio de vida."
+        },
+        { // Tema (O veneno no gelo)
+            title: "O Chá das Cinco",
+            enigma: "Três mafiosas tomaram a mesma jarra de chá gelado com cianeto. A que bebeu três copos super rápido sobreviveu. As duas que beberam de forma educada e devagar, morreram.",
+            solution: "O veneno não estava no chá, estava congelado dentro dos cubos de gelo. A senhora que bebeu rápido terminou antes que os cubos derretessem. As outras absorveram o veneno conforme o gelo derretia."
+        },
+        { // Clássico Lateral (O Homem do Elevador)
+            title: "O Velhinho do 10º Andar",
+            enigma: "O senhor mora no 10º andar. Todo dia ele desce pelo elevador. Quando volta, pega o elevador até o 5º andar e sobe o resto de escada, a menos que esteja chovendo. Por quê?",
+            solution: "O senhor é um anão. Ele consegue apertar o botão do térreo para descer, mas só alcança até o botão do 5º andar. Quando chove, ele usa seu guarda-chuva para alcançar o botão do 10º andar."
+        },
+        { // Tema (Rádio alto / Surdo)
+            title: "Um Silêncio Ensurdecedor",
+            enigma: "O idoso foi encontrado morto de causas naturais. O bizarro é que o rádio do quarto estava ligado no volume máximo, tocando jazz, mas nenhum dos vizinhos bateu na porta para reclamar.",
+            solution: "O idoso era surdo e dormia com o rádio no máximo apenas para sentir as vibrações dos graves na cama. Todos os outros moradores daquela ala do asilo também eram completamente surdos."
+        },
+        { // Tema Exclusivo (Papagaio Médico)
+            title: "A Herança Asfixiante",
+            enigma: "O bilionário estava sozinho e morreu de asfixia severa. Na sala trancada, os detetives encontraram apenas o cadáver, um pote de amendoins vazio e um papagaio na gaiola.",
+            solution: "O bilionário era alérgico a amendoim, mas tinha Alzheimer. O papagaio, treinado por um herdeiro maldoso, aprendeu a imitar a voz do médico e ficou repetindo: 'Pode comer o amendoim, o senhor não tem alergia!'. O bilionário acreditou."
+        },
+        { // Clássico Lateral (O rádio do carro)
+            title: "A Viagem Mortal",
+            enigma: "Um homem foi morto por um tiro no peito enquanto dirigia na rodovia. O carro estava com as portas trancadas por dentro e as janelas completamente fechadas. Não havia furos de bala na lataria ou nos vidros.",
+            solution: "O homem estava dirigindo um carro conversível. O teto estava abaixado, permitindo que o assassino atirasse nele por cima, mesmo com as portas e vidros laterais trancados."
+        },
+        { // Clássico Lateral (A conta do restaurante / Pelicano) adaptado.
+            title: "O Mergulhador Queimado",
+            enigma: "Um homem morto vestindo um traje completo de mergulhador foi encontrado no meio de uma floresta totalmente queimada. O mar mais próximo ficava a 50 km dali.",
+            solution: "Houve um grande incêndio florestal. Um helicóptero dos bombeiros foi até o oceano, usou um balde gigante para coletar água e, sem perceber, sugou o mergulhador junto. O helicóptero soltou a água (e o mergulhador) sobre as chamas da floresta."
+        }
+    ];
+
+    let currentIndex = 0;
+    const cardEl = document.getElementById('mystery-card');
+
+    function updateCard(newIndex) {
+        currentIndex = newIndex;
+        const data = database[currentIndex];
+        const titleEl = document.getElementById('front-title');
+        const textEl = document.getElementById('front-text');
+        
+        // Efeito de embaralhamento rápido (frufru)
+        titleEl.classList.add('shuffling');
+        textEl.classList.add('shuffling');
+        
+        let shuffles = 0;
+        let shuffleInterval = setInterval(() => {
+            titleEl.innerText = database[Math.floor(Math.random() * database.length)].title;
+            textEl.innerText = "...";
+            shuffles++;
+            if(shuffles > 5) {
+                clearInterval(shuffleInterval);
+                titleEl.classList.remove('shuffling');
+                textEl.classList.remove('shuffling');
+                
+                // Texto Final
+                document.getElementById('case-number').innerText = `CASO #${(currentIndex + 1).toString().padStart(2, '0')}`;
+                titleEl.innerText = data.title;
+                textEl.innerText = data.enigma;
+                document.getElementById('back-title').innerText = data.title;
+                document.getElementById('back-text').innerText = data.solution;
+            }
+        }, 80);
+    }
+
+    function flipCard() {
+        cardEl.classList.toggle('is-flipped');
+        try { if(navigator.vibrate) navigator.vibrate(50); } catch(e){}
+    }
+
+    function pickRandomCard() {
+        // Se a carta estiver virada, volta ela antes de trocar
+        if (cardEl.classList.contains('is-flipped')) {
+            cardEl.classList.remove('is-flipped');
+            setTimeout(() => { doRandomLogic(); }, 400);
+        } else {
+            doRandomLogic();
+        }
+    }
+
+    function doRandomLogic() {
+        let newIndex = currentIndex;
+        while(newIndex === currentIndex) {
+            newIndex = Math.floor(Math.random() * database.length);
+        }
+        updateCard(newIndex);
+        try { if(navigator.vibrate) navigator.vibrate([30, 30, 30]); } catch(e){}
+    }
+
+    // Inicializa sorteando uma aleatória logo de cara
+    window.onload = () => {
+        let startIndex = Math.floor(Math.random() * database.length);
+        updateCard(startIndex);
+    };
+</script>
+</body>
+</html>
