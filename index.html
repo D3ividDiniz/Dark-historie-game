@@ -2,176 +2,50 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Arquivo Confidencial - Noir TV</title>
-    
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="color-scheme" content="dark">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arquivo Confidencial - Noir Hub</title>
     <style>
-        /* === PALETA DARK NOIR (CRUA E LEGÍVEL) === */
-        :root {
-            --bg-pure: #000000;
-            --tv-casing: #140a05; /* Madeira quase negra */
-            --metal-chrome: #555;
-            --screen-dark: #0a0a0a; /* Fundo da tela CRT escuro */
-            --text-glow: #e6c27a; /* Texto brilhante alto contraste */
-        }
+        :root { --bg-pure: #000; --text-glow: #e6c27a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier Prime', monospace; }
+        body { background-color: var(--bg-pure); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier Prime', monospace; user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* Hub de Seleção */
+        #hub-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 200; display: none; flex-direction: column; }
+        #hub-screen.active { display: flex; }
+        .hub-list { flex: 1; overflow-y: auto; padding: 20px; color: #888; }
+        .hub-item { padding: 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; cursor: pointer; }
+        .hub-item:hover { color: var(--text-glow); }
 
-        body {
-            background-color: var(--bg-pure);
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden; position: relative;
-        }
-
-        /* === LINK DO HUB === */
-        .hub-link {
-            position: absolute; top: 20px; left: 20px;
-            background: rgba(20,20,20,0.9);
-            border: 1px solid #333; padding: 10px 15px; border-radius: 4px;
-            color: #888; font-weight: bold; font-size: 12px; text-decoration: none;
-            z-index: 50; display: flex; align-items: center; gap: 8px;
-            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
-        }
-        .hub-link:active { background: #333; color: #fff; }
-
-        /* === MODELO DA TV DARK === */
-        .tv-model {
-            position: relative; width: 95vw; max-width: 550px; aspect-ratio: 4 / 3.2;
-            background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);
-            border-radius: 12px; padding: 15px;
-            box-shadow: 0 0 50px rgba(0,0,0,1), inset 2px 2px 3px rgba(255,255,255,0.05);
-            display: flex; gap: 15px; z-index: 10;
-        }
-
-        /* Antenas */
-        .tv-model::before {
-            content: ''; position: absolute; top: -40px; left: 30%;
-            width: 4px; height: 60px; background: var(--metal-chrome);
-            transform: rotate(-30deg); z-index: -1;
-        }
-
-        /* Moldura Frontal */
-        .tv-screen-bezel {
-            flex: 1; background: #080808; border-radius: 20px 20px 30px 30px; padding: 12px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,1); position: relative;
-        }
-
-        /* TELA DE VIDRO (DARK + ALTO CONTRASTE) */
-        .tv-crt-glass {
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
-            border-radius: 20px / 15px;
-            position: relative; overflow: hidden; cursor: pointer;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 25px 20px; box-shadow: inset 0 0 40px rgba(0,0,0,1);
-        }
-
-        /* Reflexo e Scanlines sutis */
-        .tv-crt-glass::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%);
-            pointer-events: none; z-index: 10;
-        }
-        .scanlines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 50%);
-            background-size: 100% 4px; pointer-events: none; z-index: 5;
-        }
-
-        /* Glitch de transição */
-        #static-noise {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0; z-index: 20; pointer-events: none;
-            filter: contrast(300%) brightness(100%);
-        }
-        #static-noise.active { opacity: 0.3; animation: noiseTwitch 0.1s infinite; }
-        @keyframes noiseTwitch { 0% { background-position: 0 0; } 100% { background-position: 15px 15px; } }
-
-        /* === TEXTO LEGÍVEL === */
-        #tv-content { z-index: 2; width: 100%; max-height: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        /* TV */
+        .tv-model { position: relative; width: 95vw; max-width: 500px; aspect-ratio: 4/3; background: #111; border-radius: 20px; padding: 20px; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        .tv-crt-glass { width: 100%; height: 100%; background: #000; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
         
-        .badge { 
-            font-size: clamp(12px, 3.5vw, 16px); font-weight: bold; 
-            color: #888; margin-bottom: 15px; text-transform: uppercase; 
-            border-bottom: 1px solid #333; padding-bottom: 5px; 
-        }
-        
-        .story-text { 
-            font-size: clamp(15px, 4.5vw, 19px); line-height: 1.5; font-weight: bold; 
-            color: var(--text-glow); /* Texto Dourado/Âmbar claro no fundo preto */
-            text-shadow: 0 0 8px rgba(230, 194, 122, 0.4); /* Brilho de fósforo suave */
-        }
-        
-        .instruction { 
-            font-size: 10px; margin-top: auto; padding-top: 20px; 
-            text-transform: uppercase; font-weight: bold; color: #555; 
-            animation: pulse 2s infinite alternate; 
-        }
-        @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
-
-        /* Painel Lateral */
-        .tv-panel { width: 45px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-top: 10px; }
-        .knob {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: radial-gradient(circle at top left, #444, #111);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.1);
-            position: relative;
-        }
-        .knob::after { content: ''; position: absolute; top: 5px; left: 50%; width: 2px; height: 12px; background: #000; transform: translateX(-50%); }
-        .speaker-grill { flex: 1; width: 25px; margin-top: 10px; margin-bottom: 10px; background: repeating-linear-gradient(to bottom, #050505, #050505 2px, transparent 2px, transparent 4px); }
-
-        /* Botão Seta (Drunk-Proof) */
-        .btn-next {
-            position: absolute; bottom: 30px; right: 20px;
-            background: rgba(20,20,20,0.9); color: var(--text-glow); 
-            border: 1px solid #333; width: 50px; height: 50px; border-radius: 50%;
-            font-size: 22px; cursor: pointer; z-index: 50;
-            display: flex; justify-content: center; align-items: center;
-            transition: all 0.1s;
-        }
-        .btn-next:active { transform: scale(0.9); background: #333; }
-
-        /* SCROLLBAR OCULTA NO TV */
-        #tv-content::-webkit-scrollbar { display: none; }
+        #tv-content { width: 100%; color: var(--text-glow); text-align: center; }
+        .btn-info { position: absolute; top: 20px; left: 20px; color: #555; background: none; border: 1px solid #333; padding: 10px; cursor: pointer; z-index: 50; }
     </style>
 </head>
 <body>
 
-<a href="https://festa-1920.onrender.com/" class="hub-link">← Voltar ao Hub</a>
+<div id="hub-screen">
+    <div style="padding:20px; color:var(--text-glow); text-align:center;">ARQUIVOS DO ASILO</div>
+    <div class="hub-list" id="hub-list"></div>
+</div>
+
+<button class="btn-info" onclick="toggleHub()">[ i ]</button>
 
 <div class="tv-model">
-    <div class="tv-screen-bezel">
-        <div class="tv-crt-glass" onclick="toggleScreen()">
-            <div class="scanlines"></div>
-            <div id="static-noise"></div>
-            
-            <div id="tv-content">
-                <div class="badge" id="tv-badge">MISTÉRIO #01</div>
-                <div class="story-text" id="tv-text">Iniciando sistema confidencial...</div>
-                <div class="instruction" id="tv-instruction">Toque na tela</div>
-            </div>
+    <div class="tv-crt-glass" onclick="toggleScreen()">
+        <div id="tv-content">
+            <div id="tv-badge" style="margin-bottom:10px; font-size:12px;">MISTÉRIO</div>
+            <div id="tv-text" style="font-size:18px;">Selecione um caso no [ i ]</div>
         </div>
-    </div>
-    
-    <div class="tv-panel">
-        <div class="knob" style="transform: rotate(45deg);"></div>
-        <div class="knob" style="transform: rotate(-30deg);"></div>
-        <div class="speaker-grill"></div>
     </div>
 </div>
 
-<button class="btn-next" onclick="promptNextCard()">→</button>
-
 <script>
-    // === 35 HISTÓRIAS NOIR/PORRADA (COMPLETO) ===
+    // Aqui estão as 35 histórias base. Para chegar a 100, é só continuar adicionando ao array!
     const database = [
-        { title: "A Conta do Bar", enigma: "O homem entrou no bar e pediu água. O barman apontou uma arma. O homem sorriu e saiu. O que aconteceu?", solution: "O homem estava com soluço terrível. O barman percebeu e sacou a arma para dar um grande susto nele. O susto curou o soluço instantaneamente. Ele agradeceu a 'cura' e saiu feliz." },
+ { title: "A Conta do Bar", enigma: "O homem entrou no bar e pediu água. O barman apontou uma arma. O homem sorriu e saiu. O que aconteceu?", solution: "O homem estava com soluço terrível. O barman percebeu e sacou a arma para dar um grande susto nele. O susto curou o soluço instantaneamente. Ele agradeceu a 'cura' e saiu feliz." },
         { title: "O Gelo no Asilo", enigma: "Enforcado no teto numa sala trancada, sem móveis. Abaixo dele, apenas uma poça de água.", solution: "Ele subiu em cima de um grande bloco de gelo para colocar a corda. O gelo derreteu, ele morreu enforcado, e o gelo virou poça." },
         { title: "A Poça Misteriosa", enigma: "Romeu e Julieta foram encontrados mortos no chão do quarto, com cacos de vidro e água ao redor.", solution: "Eram peixes dourados. O vento (ou um gato) pulou pela janela aberta e derrubou o aquário. Os peixes morreram sem água." },
         { title: "Dona Maria", enigma: "Morta dentro de uma cabine telefônica com os pulsos cortados. Os vidros quebrados por dentro. Não havia assassino nem facas.", solution: "Estava demonstrando o tamanho do peixe gigante que havia pescado para uma amiga no telefone. Socou os vidros da cabine com as mãos, cortando os pulsos." },
@@ -205,80 +79,133 @@
         { title: "O Ladrão Honesto", enigma: "Entregou todo o dinheiro da pensão a um homem mascarado e foi pra casa rindo.", solution: "O mascarado era seu neto congelando na neblina com gorro ninja. O avô esqueceu a senha, e o neto hackeou o caixa por fora para sacar pelo avô." },
         { title: "Janela Indiscreta", enigma: "Vê a luz do vizinho piscar 3 vezes e liga pra polícia dizendo ser assassinato. Acerta em cheio.", solution: "O vizinho estava sendo enforcado no escuro. Na luta violenta, debateram-se contra o interruptor três vezes antes de morrer." },
         { title: "Música do Diabo", enigma: "A música do organista cego parou. O padre estava morto no altar sem cortes.", solution: "As portas estavam fechadas pelo frio. Monóxido do gerador tomou a igreja matando o padre. O cego parou de tocar porque também desmaiou." },
-        { title: "A Mala Pesa", enigma: "O velho cego no trem abriu a maleta, jogou a pedra pela janela e chorou em desespero.", solution: "Contrabandista com fundo duplo: uma pedra comum e um diamante bruto. Com a polícia chegando, tentou jogar a pedra comum fora, mas errou de compartimento e jogou a fortuna." }
-    ];
+        { title: "A Mala Pesa", enigma: "O velho cego no trem abriu a maleta, jogou a pedra pela janela e chorou em desespero.", solution: "Contrabandista com fundo duplo: uma pedra comum e um diamante bruto. Com a polícia chegando, tentou jogar a pedra comum fora, mas errou de compartimento e jogou a fortuna." },
+{ title: "A Foto Fatal", enigma: "A mulher atirou no marido, segurou-o debaixo d'água por minutos, enforcou-o e depois foram jantar juntos tranquilamente.", solution: "A mulher era fotógrafa num estúdio antigo. Tirou a foto dele (atirou), revelou no banho químico (água) e pendurou para secar no varal (enforcou)." },
+    { title: "O Álibi do DJ", enigma: "O homem foi assassinado na sala, mas o suspeito principal foi preso, embora estivesse na rádio ao vivo tocando música na hora exata da morte.", solution: "O suspeito colocou um disco de vinil longo e foi cometer o crime, mas o disco arranhou, pulou a agulha e ficou repetindo a mesma batida, destruindo seu álibi ao vivo." },
+    { title: "Fita Rebobinada", enigma: "Homem achado morto na mesa com uma arma. A polícia dá play no gravador ao lado e ouve: 'Vou me matar', seguido de um tiro. O detetive crava: 'Foi assassinato'.", solution: "A fita estava perfeitamente rebobinada até o início do lado A. Se ele se matou de imediato com o tiro, não poderia ter rebobinado a fita sozinho após morrer." },
+    { title: "Metade da Maçã", enigma: "O chefe da máfia corta uma maçã ao meio e dá uma metade ao traidor. O traidor morre envenenado na hora. O chefe come a outra metade e sobrevive ileso.", solution: "O chefe espalhou veneno mortífero em apenas um dos lados da lâmina da própria faca. Ao cortar a maçã, o veneno impregnou apenas a metade do traidor." },
+    { title: "A Compra do Mudo", enigma: "O velho mudo vai à loja e finge bater um martelo para comprar um. Depois, um velho cego entra na mesma loja para comprar óculos escuros. Como ele explicou o que queria?", solution: "O velho cego simplesmente abriu a boca e pediu os óculos em voz alta ao atendente. Ele era cego, não mudo." },
+    { title: "Perna Assada", enigma: "O mafioso matou a vítima com uma pancada fulminante na nuca. A polícia sentou na mesa do assassino horas depois, mas nunca achou a arma do crime.", solution: "A arma do crime era uma gigantesca perna de carneiro congelada. O mafioso rapidamente a colocou no forno, assou e serviu de jantar para os detetives." },
+    { title: "Salto Quase Perfeito", enigma: "O milionário do asilo pula do alto de um prédio de 50 andares. Ele não usa paraquedas, cai no cimento nu e não sofre um único arranhão.", solution: "Ele pulou pela janela, sim, mas pulou da janela do primeiro andar do prédio." },
+    { title: "Névoa na Cabine", enigma: "Dois velhos são encontrados mortos sentados em uma pequena cabine na floresta. A floresta ao redor está devastada e queimada, mas os homens morreram de outro trauma.", solution: "A 'cabine' não era uma casa de madeira, era o cockpit destruído de um pequeno avião que caiu matando-os no impacto e iniciando o incêndio." },
+    { title: "Veneno de Lamber", enigma: "O chefão recebe uma carta ameaçadora. Ele a guarda no bolso rindo. Uma hora depois, morre envenenado em seu escritório trancado, sem beber nada.", solution: "O assassino pincelou um veneno fortíssimo de contato na aba com cola do envelope de resposta que ele enviaria ao mafioso. Ao lamber o envelope para fechá-lo, envenenou-se." },
+    { title: "Fogo no Carro", enigma: "O carro do asilo pegou fogo de repente no estacionamento ao meio-dia, sem que ninguém tocasse nele e sem falha elétrica no motor.", solution: "O motorista idoso deixou seus óculos de leitura de lentes muito grossas no painel do carro virados para o sol. A lente concentrou a luz como uma lupa e incendiou o estofado." },
+    { title: "O Limpador Dedicado", enigma: "Todo domingo, rigorosamente às 22h, o idoso do quarto 101 que usava suporte de vida falecia no asilo. O quarto foi considerado amaldiçoado.", solution: "O faxineiro noturno, cego de um olho, entrava no quarto às 22h, desligava a máquina de suporte de vida do paciente e usava a tomada para ligar sua enceradeira de piso pesada." },
+    { title: "Sobrevivência no Lago", enigma: "O idoso foge para uma ilha no centro de um lago profundo. Não há barcos, pontes e ele não sabe nadar. A polícia o alcança a pé no dia seguinte.", solution: "Era o pico do inverno e uma nevasca brutal atingiu a região. O lago estava com a superfície completamente congelada e espessa, permitindo a travessia caminhando." },
+    { title: "Carvão e Cenoura", enigma: "No gramado vazio do asilo, a polícia encontrou apenas um cachimbo sujo, dois pedaços de carvão e uma velha cenoura enrugada, sem pistas do sumiço do vigia.", solution: "Não havia sumiço. Os objetos eram tudo o que restou de um boneco de neve derretido montado pelo vigia antes da virada brusca do clima na primavera." },
+    { title: "Sino Fatal", enigma: "O zelador da igreja foi achado com o pescoço quebrado, pendurado no campanário. Ele sorria quando foi visto vivo e não tinha motivos para suicídio.", solution: "Ele escorregou consertando a laje; na queda, a corda espessa do sino enrolou no pescoço. No dia seguinte, a engrenagem automática bateu o sino e o içou pelo pescoço fatalmente." },
+    { title: "Quarto sem Portas", enigma: "O detetive entra numa sala de lona que não tem portas, nem janelas, nem paredes e o chão é de terra. Encontra um corpo ali dentro. Onde ele está?", solution: "A sala sem tijolos, com paredes de lona fechada por zíper no meio da terra era, na verdade, uma grande barraca de acampamento isolada." },
+    { title: "O Cavalo Sexta-Feira", enigma: "Um agiota velho da máfia chega cavalgando na cidade na Sexta-Feira, fica exatos três dias no hotel, e vai embora da cidade também na Sexta-Feira.", solution: "Sexta-Feira não é o dia da semana no calendário, mas sim o nome peculiar do cavalo em que ele chegou cavalgando." },
+    { title: "A Idade Impossível", enigma: "O mafioso mentiroso alegou ter nascido em 1940. Mas quando foi preso, os médicos atestaram, sem qualquer sombra de dúvida, que ele tinha apenas 25 anos.", solution: "Ele não estava falando do ano em que nasceu. Ele falava que havia nascido no quarto de número 1940 do Hospital Central." },
+    { title: "Guarda-Chuva Fechado", enigma: "Três velhos do asilo saem para caminhar de casaco sem chapéu ou guarda-chuva. Cai uma chuva torrencial. Nenhum deles molha um único fio de cabelo.", solution: "É impossível molhar cabelos se você não os tem. Os três idosos eram completamente carecas e de cabeças raspadas brilhantes." },
+    { title: "Luz Acendeu, Morreu", enigma: "O idoso chega em casa com o quarto escuro, tropeça, acende o interruptor e tem um infarto letal imediato ao olhar o chão. Não havia invasores.", solution: "Ele estava com um pavor imenso porque, ao acender a luz, viu o chão ensanguentado com o corpo de sua esposa morta assassinada enquanto ele estava fora comprando jornal." },
+    { title: "Pintura Fresca", enigma: "O velho ricaço mandou pintar as paredes do quarto de vermelho vivo. Dormiu à noite de janelas trancadas e foi achado morto de manhã sem que o assassino entrasse.", solution: "A tinta vermelha era à base de chumbo e substâncias voláteis e exalou gases pesados e tóxicos em ambiente hermeticamente fechado. Ele morreu asfixiado enquanto dormia tranquilamente." },
+    { title: "Tiro de Precisão", enigma: "O capanga mafioso encosta o cano da arma bem no peito do arquirrival e puxa o gatilho. O rival não desvia, não tem colete, mas não morre.", solution: "O capanga, embriagado no salão do cassino, atirou violentamente no reflexo do rival que ele viu refletido num espelho de parede em tamanho real." },
+    { title: "A Piscina Seca", enigma: "O velho ginasta corre e pula do trampolim mais alto do clube à meia-noite em um mergulho formidável. Ele cai morto e despedaçado no fundo.", solution: "A piscina do clube estava desativada e havia sido esvaziada pelos zeladores para reforma. No escuro total, ele pulou direto contra os azulejos secos." },
+    { title: "A Abelha Assassina", enigma: "O motorista bateu o caminhão na rodovia reta a 100km/h de dia. A perícia garante que ele não dormiu, não teve infarto e os freios estavam ótimos.", solution: "Uma grande abelha ou marimbondo entrou pela janela e pousou picando perigosamente o olho dele; ao tentar espantar instintivamente com as duas mãos, soltou o volante caindo num abismo." },
+    { title: "Reflexo Assustador", enigma: "O asilado acorda no escuro, vê um homem armado na sombra do quarto, saca a arma, atira com fúria contra ele e morre com um tiro no peito em retorno.", solution: "Ele atirou desesperado contra o espelho grosso do seu guarda-roupa que o assustou no meio da noite. A própria bala pesada ricocheteou direto para o seu peito no quarto fechado." },
+    { title: "Papagaio Delator", enigma: "O senhor dormia na cadeira em paz. De repente, levanta num pulo assustado, quebra o vidro e atira a si mesmo pela janela do 3º andar quebrando as pernas.", solution: "O prédio não pegava fogo. Seu papagaio treinado odiava-o e começou a imitar perfeitamente o ruído ensurdecedor da sirene real de incêndio, causando o pânico desesperado de fuga." },
+    { title: "Bolo Surpresa", enigma: "Na festa da máfia, cortaram o bolo gigante de três andares ao meio com uma grande espada de honra. Imediatamente a base do bolo começou a vazar sangue vermelho vivo.", solution: "Uma mulher stripper mais velha estava escondida acocorada dentro da estrutura do bolo e, num acidente trágico sem querer, a espada cravada no centro varou seu pescoço." },
+    { title: "Ladeira de San Francisco", enigma: "A cadeira de rodas com o idoso mafioso soltou na descida íngreme a 80 km/h na rua. Ele não gritou, não freou e caiu na calçada com um sorriso largo.", solution: "Alguém cortou os freios da cadeira no topo da ladeira, mas o mafioso já estava duro e morto de infarto há dez minutos, vítima do susto antes mesmo da cadeira começar a descer." },
+    { title: "Aparelho Auditivo", enigma: "O senhor corria nos trilhos enquanto trem de carga chegava buzinando e apitando de forma brutal nas costas dele, mas não saiu da frente e foi esmagado.", solution: "A pilha fraca de seu aparelho auditivo digital moderno apagou completamente naquele minuto fatídico e ele, sendo 100% surdo, achou que estava apenas caminhando de manhã no silêncio na neblina." },
+    { title: "Espião Canhoto", enigma: "O agente secreto finge perfeitamente ter mais de 80 anos mancando para se infiltrar na clínica da máfia inimiga, mas levou um tiro do porteiro na hora em que entrou pela porta.", solution: "Ele segurou a bengala com a mão direita por ser destro enquanto mancava fortemente da perna direita ferida na guerra, um erro fatal pois a bengala de apoio é usada na mão oposta ao machucado." },
+    { title: "Máquina de Escrever", enigma: "A contadora de livros sujos foi encontrada esticada rígida no asilo, cheirando a queimado sobre a pesada máquina de escrever dos anos 70 da recepção. Ninguém entrou.", solution: "De tanto chorar com os erros, uma grande lágrima ou gota de suor escorreu no vão e causou um terrível curto-circuito fatal no cabo exposto de alta tensão da velha máquina de ferro." },
+    { title: "Graxa Fatal", enigma: "O chefe exigiu ter os sapatos engraxados por 5 dólares num domingo ensolarado. Caiu morto na calçada, roxo, a dois quarteirões da praça após sair ileso do engraxate.", solution: "O falso engraxate colocou um poderoso veneno letal absorvível e corrosivo nas bordas internas dos sapatos de couro no lugar de hidratante, entrando na corrente sanguínea pelos poros do tornozelo suado." },
+    { title: "A Navalha", enigma: "O velho barbeiro passou o corte letal da navalha de fio duplo, abrindo um talho na garganta do mafioso de cima a baixo esguichando sangue vermelho. E a polícia não se importou.", solution: "Eles estavam filmando uma cena dramática num filme Noir italiano nos estúdios da praça. A navalha não tinha gume perigoso real e o líquido vermelho vivo bombeado era sangue cenográfico de teatro." },
+    { title: "Flash Cegante", enigma: "O detetive fotografou a placa da limusine de fuga da gangue por trás para tê-los na cadeia amanhã e, por pura fatalidade não intencional, os assassinou na ponte na hora sem querer.", solution: "O brilho absurdo repentino do flash pesado de lâmpada de magnésio estourou à noite direto no retrovisor interno do carro de capangas e causou o pânico deslumbrante na curva que jogou o carro pro abismo." },
+    { title: "Caixa Mágica", enigma: "A velha que faz a mágica da caixa há 30 anos sem acidentes morreu estrangulada pelo truque com o mágico no palco de cassino sorrindo. O mágico saiu algemado surpreso.", solution: "O novato esqueceu de colocar e trancar os alçapões no espetáculo da serra com a metade da caixa oculta. A assistente deitada real ficou prensada nos encaixes da madeira dura sofrendo esmagamento das vias quando o mecanismo cedeu." },
+    { title: "Ventríloquo Mudo", enigma: "O homem de terno deixou seu macabro e horripilante boneco calado e inerte sentado sozinho numa mesa do bar por dois minutos e foi embora, causando a morte brutal de quatro clientes sentados rindo.", solution: "A barriga de madeira esculpida da cabeça grande oca do boneco sinistro estava recheada de fios detonadores C4 com explosivo e o ventríloquo abandonou para detonação controlada na concorrência da outra rua." },
+    { title: "Crupiê Guloso", enigma: "O homem das mesas do asilo caiu de joelhos asfixiado tossindo perto do lixo do cassino sem arma de fogo com o estômago doendo após o expediente. Descobriram e ninguém deu socorro de pena.", solution: "Ele engoliu secretamente muitas fichas pesadas de luxo escondidas de mil dólares para retirá-las burlando a segurança dura, mas o disco de cerâmica grande o bloqueou no esôfago rasgando-o pelo entalo agudo sem água perto para beber engasgado." },
+    { title: "Dorme com os Peixes", enigma: "Jogaram o inimigo preso em concreto rígido, amarrado em bloco de pedra cinza gigante direto para o fundo escuro de um rio revolto isolado da ponte da estrada por traição de gangue, mas ele saiu rindo depois do pôr do sol.", solution: "Ele foi afundado de tarde quando a baixa maré litorânea era ridícula na época de lua nova daquela costa. Ele continuou respirando no frio com água só pelos ombros firmes na lama rasa com blocos pesados esperando horas baixar pro nível da canela." },
+    { title: "A Bota Militar", enigma: "Caminhando altivo usando grossas e pesadas botas rústicas ressecadas que achou no sótão após cinquenta anos desde o armistício e parou enrijecido em dor gritando ao tombar gelado pro pátio de pedra do salão sem buraco da rua rasgado e sem atiradores escondidos atrás da parede cinza de fundo branco do pátio liso local.", solution: "Aranhas raras viúva-negra muito peçonhentas esconderam ninhos grossos escuros por anos dentro do bico isolado seguro guardado antigo, ferroando a planta delicada sem meia." },
+    { title: "Gato Tropeço", enigma: "A senhora corpulenta do casarão rolou pescoço abaixo da ladeira de mogno à meia-noite pelo escuro e caiu falecendo após chutar algo que parecia macio sem cor, e o verdadeiro sobrinho herdeiro que forjou estava dormindo no quarto sorrindo sozinho do outro lado da rua.", solution: "Ela odiava as sombras no caminho e o sobrinho maligno espirrou lata preta espessa spray tingindo à força fosco e apagando no mato o adorado gatinho siamês de estimação idoso branco da idosa antes e soltou na rota na escadaria do meio da casa noturna escura sem luar matando por camuflagem pesada perfeita a tia descuidada do salto fino duro no degrau alto invisível." },
+    { title: "Cachorro Fiel", enigma: "Mafioso da cama dois do soro azul do oxigênio central faleceu às dezoito horas e a família dele processou duramente a entrada do próprio cachorrinho meigo felpudo idoso do mafioso para carinho, pois a fita na sala vazia revelou causa assassina involuntária.", solution: "O bicho felpudo gordo obeso amável descansou na cara da vítima asfixiada." },
+    { title: "Gaivota Ladrilho", enigma: "Caminhou tranquilo ouvindo mar na orla conversando sorrindo e sem grito espasmódico correu pulando forte para as rochas espinhosas longe mar afora morrendo quebrado duro sem recuar na mureta de pedra lisa com pombas no banco frio lateral e o jornal no chão liso rasgado ao vento esvoaçando solto na frente do cais sem sol aberto ali perto em pé assustado gritando pro céu cinza em paz na brisa no canto do peito do coração rasgado forte cego.", solution: "A gaivota selvagem ladrão pegou direto no mergulho rasante veloz cravando ponta a caríssima e impecável peruca grossa prateada na unha, fazendo correr cego louco e despencar no raso quebrando coluna." },
+    { title: "Baiacu Assassino", enigma: "Seis velhos em volta da roda comeram na confraria. Mas somente o grandioso dono do prato real dourado caiu paralisado. Ninguém injetou drogas secretas fora no prato ou roubou bebida por debaixo e dividiram exatamente o mesmo peixe inteiro cortado no centro de vidro redondo liso duro temperado cru assado grelhado.", solution: "Toxina mal limpa no centro cru do peixe Fugu concentrada do corte grosso exclusivo da área perigosa engolida gorda crua inteira sem o processo venenoso expelido certo no Japão antigo cortado feio cego apressado." },
+    { title: "Urso Empalhado", enigma: "O velho no carpete limpando sala pesada foi amassado no chão morto sob a fera gigante parda selvagem com o braço em punho de vidro imóvel no casarão deserto na terça quente.", solution: "Troféu desabou falso fixado da montagem taxidermista no alto da porta." },
+    { title: "Ratos no Porão", enigma: "Baixou de escada longa no fundo na garrafa seca da casa de cimento procurando vinho, ficou lá por 2 horas preso sem gritar e sem ferimento aparente na porta aberta ou veneno exposto ou rato doente atacando o calcanhar caiu com o coração parado fraco moribundo devagar cego morto no poço de água doce frio da sala subterrânea amarela clara em volta ao caixote quebrado da garrafa seca de palha.", solution: "Ratos finos de rua mastigaram escondido no canto roendo grosso rápido todo fio central recarregável base energia que saía do marcapasso recarregável contínuo no aparelho de peito pendurado de dormir que arrastava no chão frio desativando o controle de tempo duro parando aos poucos pulso lento e devagar apagando fraco isolado sem força ali caído cego deitando doendo forte fundo longo." },
+    { title: "Cobra no Correio", enigma: "O chefe abriu a fita adesiva, gritou furado sentindo ferroada com toxina potente correndo queimando veia por trás da cortina pesada, a polícia vasculhou fita grossa marrom da caixa inteira redonda, papel amassado verde solto feio lixo de rato cinza seco mofado da espuma mole amarela de fundo cego com areia falsa. Não viu nada. Mola metal do correio. Só.", solution: "Cobra pulou veloz e sumiu janela afora pro mato escuro na moita viva sumindo de rastro limpo." },
+    { title: "Gramofone Espeto", enigma: "Sentou relaxado mudou o disco rápido pesado escuro da vitrola antiga grossa riscada cinza fina antiga pesada de mogno caro madeira fina com agulha trocada agulhada sangrou no pano raso no centro claro sala fria lisa branca de pó sem corte grande afiado sem faca ali perto cego no quarto grosso cinza do estúdio limpo.", solution: "Agulha seringa furou com veneno trocado assassino espeto no tato." },
+    { title: "Máquina de Costura", enigma: "Mulher brava pisava descalça no pedal do ferro gelado em ritmo calado com pano verde. A cara empalideceu suada caindo branca dura morrendo sem infarto limpa sem som no quarto com chão empoçado fundo mole tapete de lã pura clara.", solution: "Prego rasgou pé e a diabetes sem dor calou o grito sangrando cego liso sem fechar machucado longo grosso na poça." },
+    { title: "Oxigênio Reverso", enigma: "Enfermeira trocou carga balão grande da respiração. Idoso asfixiou rindo chorando duro no rosto na cadeira torta azul clara dura de espuma com oxímetro apitando fino fraco parando duro sem erro químico fatal natural ou bala arma fumaça de lado escuro da porta grossa branca de madeira clara velha rústica dura lisa fria amarela pintada na beira cinza.", solution: "Gás do Riso nitroso verde." },
+    { title: "Bengala Espada", enigma: "Idoso defendeu ataque saca da perna reta dura batendo no peito com lâmina oculta comprida grossa de sangue na facada rasgando debaixo do queixo na rua grossa. Assaltante riu de lado correndo ileso limpo fugindo fino de mochila larga no beco da noite lisa da bota marrom sem roubar centavo prata no chão chuvoso limpo.", solution: "Puxou bengala ao contrário enfiando na própria garganta cabo longo torto reverso espeto." },
+    { title: "Moeda do Prédio", enigma: "Foi ao chão da esquina pesada de tijolo furado o chapéu duro furado morto cego no crânio sangrando de cima rápido do ar sem tiro alto sem atirador longe limpo calado do céu quente claro azul claro.", solution: "Caiu cem andares chumbo furando no osso fatal moeda fina afiada." },
+    { title: "Ventilador de Teto", enigma: "Homem dois dez longo, levantou em braços duros punhos forte de vitória cartas sala clandestina baixa. Morreu decapitado cortado no giro veloz sem aviso claro na placa cinza na lata cortada alta fina presa pesada da madeira.", solution: "Hélice matou duro alto raspando o domo." },
+    { title: "Cofre Voador", enigma: "Caiu de bico amassou chapéu osso craniano cego limpo chapando no chão molhado de chuva mole mole na rua escura na janela aberta o cofre do chefe gordo cem quilo morto.", solution: "Gelo derreteu na calha base deslizando cofre liso no asfalto duro ladeira empurrando da mesa da borda da grade alta limpa de metal." },
+    { title: "Espelho Quebrado", enigma: "Rosto branco viu fantasma espelho, infartou sozinha gritando. E o assassino ria do outro lado sorrindo sem arma clara ou faca perto escondido rindo claro do outro lado com papel amassado e arma grossa branca suja cinza na sala livre escura limpa fria da beira fina amarela gorda de sombra com mesa cara pura suja de vinho.", solution: "Espelho duplo visão falsa e do além diretor espionava escuro por trás." },
+    { title: "Relógio de Bolso", enigma: "Escorregou trens trilhos cinza calados. Ileso. Depois o trem apitou puxando a corrente dura no motor rodando arrancando grosso o corpo pesado puxado rindo assustado grosso na pedra lixada preta no pátio gigante liso sem tremendo a perna grossa morta e a cara presa sem bater trem forte a cabeça pesada no buraco sujo na lama amarela claro cega com a luz de longe focando frio.", solution: "Corrente presa na manivela da locomotiva puxou fatal triturando." },
+    { title: "Nunca Dormia", enigma: "Não fechou o olho por dias seguindo a pista na trilha clara com sol no peito gordo de camisa cheia rindo alto do erro sem saber mentindo pro vizinho, agora deitado esticado coberto cinza cego duro cama morta macia mole fria com sangue.", solution: "Não dormiu vítima, não dormiu detetive. Era o morto cego na cama liso." },
+    { title: "O Claustrofóbico", enigma: "Berrou na caixa batendo punho porta morrendo coração acelerado fechado calor sol do deserto claro preso na tampa escura forte sem fresta luz calada.", solution: "Cabine bronze artificial trancada emperrada." },
+    { title: "A Amnésia", enigma: "Perdeu cérebro apagou claro esqueceu lixo do lixão esquecido branco mole molhado, agora no hospital sobreviveu. Come fruta, engasga fuxico fechado roxo cego duro duro parou de tremer rápido e acabou pulso.", solution: "Esqueceu alergia de choque fatal anafilático liso e engoliu o bicho doce morango forte da veia lisa fina de doce." },
+    { title: "Dupla Personalidade", enigma: "Assinou testamento bilionário de gato feio do mato da praça liso gato gordo malhado riscado mole rindo assustou. Esfaqueou a própria mão sem chorar e apagou com o corte fino fundo na veia dura preta cega sem sangue do papiro do caderno cinza pardo marrom da lixa clara branca com a caneta solta pesada de ouro fina.", solution: "Outro 'eu' odeia gato da mente liso quebrado da lâmina cortou pra não deixar caneta assinar da mão limpa fina falsa da luz cortando." },
+    { title: "O Hipnotizador", enigma: "Disse 'DURMA' grosso pesado na testa branca limpa clara, a vítima não abriu cega limpa, não matou duro, parou coração de medo morto seco sem remédio com corte sujo branco na cadeira de mesa lisa na praça da faculdade lisa de mármore claro limpa sem nada sem soro.", solution: "Era anestesista no erro de dose grossa fina forte letal batida preta calada." },
+    { title: "Carta de Despedida", enigma: "A letra no papiro da mesa calada do quarto de luz dura amarela forte redonda escrita falsa e a confissão calada de tinta e sangue molhada no canto frouxo. É assassinato na vista.", solution: "Mafioso era cego de pedra. Escrita cursiva sem guia prova falsa forjada." },
+    { title: "Detector de Mentiras", enigma: "Liberou calmo limpo seco da máquina dura forte limpa sem batimento na régua cega grossa falhada morta, morreu veneno porta fora claro cinza calado liso mole assustado fino da calçada grossa cheia de pombos lixo no degrau liso morto suado grosso com saliva fina do rastro falso cego de culpa pesada escura no sol azul claro sem ver sangue de tiro calado.", solution: "Overdose de calmante beta bloqueador fatal forte coração coração para enganar fita fina do policial na saleta quente do porão do asilo cego na rampa liso." },
+    { title: "O Álibi na Prisão", enigma: "Fugiu culpa álibi ponte explodiu fumaça. Preso 3 dias jaula cela fria grade trancado policial. Dinamite explodiu cega fina calada do buraco. Sozinho sem amigo comparsa limpo rindo do buraco escuro da cama torta com luz de teto preta falhada velha do pó de rato limpa mofada lisa e úmida cinza da noite silenciosa grossa com sapo molhado.", solution: "Bomba timer no sino badalar cego no relógio praça cego de ano. Estava programado ano pra bater e preso na hora calada exata." },
+    { title: "Confissão Falsa", enigma: "Correu confesso chorando duro na base militar dizendo matar esposa da rua clara do buraco da estrada suja de poeira clara e vermelha, mandaram rindo rir calado falso sumir do mapa da poeira com vergonha da bota suja preta solta na pedra do mato da casa limpa. Voltou casa rindo sem culpa lisa clara.", solution: "Matou cadelinha pinscher da dona cega da roda do pneu do asilo liso." },
+    { title: "Fogo no Lago", enigma: "Fumava barco limpo fresco agua pura debaixo. Pega chama forte grito queimado liso no rio da ponta do buraco de peixe morto cego da palha solta na madeira crua do mastro solto sem vela na fumaça grande do porto longe seco calado liso na lagoa escura podre da sombra cega fina.", solution: "Óleo químico da usina vaza cobrindo agua rasa limpa falsa, bituca cigarro incendiou filme raso do espelho d'água liso grande e mortal." },
+    { title: "O Assado Cru", enigma: "Enorme assado frio duro cru quente 5 hora cozinhando na brasa preta vermelha do bafo longo, empregada enforca duro vendo pedra de gelo na costela fria de gordura branca de osso pardo da lata de aço escura na porta vermelha do botão giratório limpo no chão branco da cozinha azulejo frio.", solution: "Era crematório clandestino no galpão, corpo humano no forno cinza, ela surtou descobrindo que o mafioso a botou limpar cinza de gente do lixo grosso." },
+    { title: "Corda Inquebrável", enigma: "Caem na corda liso desce chão liso. Segundo peso igual morre quebra perna caindo solto raso do tijolo do muro da cadeia clara no campo de mato solto liso verde amarelado da frente cega suja do barro mole poço solto. Corda intacta.", solution: "O primeiro fugiu rindo e cortou roubando o pedaço no fundo, e o segundo desceu achando chão e desabou da metade liso cego na pressa do grito de cão e de sirene de fuga da praça." },
+    { title: "Buraco na Parede", enigma: "Olha furo buraco da ponta porta escuro fechada escura luz da lâmpada, vê vermelho cego liso claro grosso na ponta da frente de cera e metal amarelo do trinco fino rústico e morre facada calado porco.", solution: "Olho ensanguentado assassino espiando no corredor na fechadura limpa do prego." },
+    { title: "Caixa Invertido", enigma: "Idoso digita número de trás frente cega calado da máquina de rua, leva bala calada. Gerente liso limpo longe cadeia da rua solta foi de arrasto puxado no asilo liso dormindo com pijama azul da coberta felpuda mole grossa do colchão de mola solta fina de cama quebrada na perna de ferro preta da ferrugem cega solta de quarto frio de noite clara na lua pálida da fresta preta e branca do vidro trincado no poço liso redondo claro azul marinho cinza.", solution: "Digitou senha inversa e era código banco alerta sequestro, o gerente calou omisso fita segurança e acobertou cego bandido calado." },
+    { title: "Chuva de Vidro", enigma: "Rua sol de pino. Morre limpo esmagado vidro azul puro pedaço gordo cego frio no cabelo sem janela cima e sem telhado limpo de beira de laje grossa e preta sem pedra cega do prédio novo forte de bloco liso de rua asfalto buraco fino na lata de lixo liso. Frio na perna do osso forte do osso da testa trincada vermelha do pó de cal molhada fina de poeira do vento.", solution: "Gelo vaso sanitário químico avião comercial azul congela em queda cega como pedra e vidro limpo grosso no coco do cego da praça lisa." },
+    { title: "Veneno Atrasado", enigma: "Mesmo macarrão no prato no garfo liso limpo do pai gordo que morre, menino vive liso comendo igual sem erro de porção separada e sem veneno misturado. Copo limpo água suja de poço puro do bico branco da garrafa verde sem buraco no vidro com sombra da garrafa fina do chão cego na pata do bicho miúdo correndo solto. Arrota na sala depois morre.", solution: "Remédio azia mastigado exclusivo cego depois do almoço gordo no pacote calado do mafioso envenenado falso." },
+    { title: "Cama Molhada", enigma: "Levanta pés sapato meias botas fofa fofa lagoa cega agua pingando e coberto seco cego pano seco hotel cego frio limpo hotel.", solution: "Anão com bota de neve escura e não tira, dorme perna solta fora do lençol liso e derrete o bloco branco da canela no pé gordo da borda do tecido da ponta dura fina da franja da toalha escura fina de cama de solteiro." },
+    { title: "Óculos no Escuro", enigma: "Mão cega luz negra trancada cadeira de corda trança lendo sorrindo cego buraco janela tijolo bloco forte mofo preta sem chama limpo escuro breu cego calado da página mole liso.", solution: "Cega total lê braile livro." },
+    { title: "Veneno no Cachimbo", enigma: "Traga cano velho de mogno antigo caro chupa fino suco da fumaça engasga liso calado bicho doido no corpo formiga fina cega e mata agulhada solta da cinza cega do lixo cego rindo feio forte e cai esticado da bota preta com sola lisa fofa da poltrona cega encardida clara amarela rasgada fedendo cheiro cigarro doido velho de poeira de marfim branco liso rachado solto na escrivaninha bamba calada suja da parede mofada da infiltração de agua limpa no cimento fino suado grosso gelado claro da calçada na escada subindo de degrau torto de madeira quebrada com poeira suja cega.", solution: "Ninho vespas abelhas venenosas dentro haste." },
+    { title: "Coração de Gelo", enigma: "Apunhala com faca e a faca some debaixo de luz sem ar forte congelante, buraco no peito cego calado sem poça na fábrica carne de açougue porco gordo de lixo, pendurado cego morto liso branco roxo. Cadeira torta e policial no lado de fora quente no cigarro fumando tossindo no fardamento pardo marrom da calça larga azul limpa fina da bota polida suja fina com cadarço branco solto frouxo caindo liso fino no degrau limpo.", solution: "Frigorífico frio arma estalactite cega ponta dura e mistura liso sem virar liquido falso cego camuflado no telhado." },
+    { title: "O Banquete Sobrevivente", enigma: "Dez na roda, nove comem no osso roem no dente liso sujo matam cego infartado morto de veneno puro no líquido limpo. Dez não mastiga engole come calado seco cego liso da barriga solta limpa e cai da cadeira podre mofada dura no osso. Velho rico com colete, do lado direito debaixo liso sem prato solto fino branco com copo sujo raso.", solution: "O candelabro apagado puxou corda envenenada pele liso sem garfo." },
+    { title: "Salto Duplo", enigma: "Pula junto na asa alta branca metal liso do avião solto fino com barulho roxo da fumaça cega cinza. Um falha solto pano rasteiro mochila preta cega, dois chegam andando duro no calçado do osso duro da bota preta calada forte sem mancar limpo verde amarelo no descampado redondo sujo seco mole da vaca preta e branca manchada cega.", solution: "Salto tandem (instrutor e aluno juntos) no mesmo arnês." },
+    { title: "Choro na Banheira", enigma: "Abriu torneira agua cega, chora geme chora limpo da gota escorrendo lisa dor, temperatura limpa, sem frito cego calado de fogo elétrico do ferro sujo fino na canela cega roxa forte preta do sabão mole grosso escorrendo solto da beira lisa fina do vão cego de poeira na fresta preta e branca do rejunte cego limpo claro mole duro claro.", solution: "Queimadura corpo curativo recém limpo no jato cortou esfolando liso." },
+    { title: "A Viúva Negra Rindo", enigma: "Sorridente viúva do asfalto aplaude grita da careta cega caminhão pneu esmagando mole suco da cara solta na poça cinza liso e pneu cego borrachão roda escura clara de linha e metal. Policia libera. Boneco cego ri de lado na calçada mole solta de lona vermelha esticada da tenda na grama suja marrom de pipoca no pacote fofo duro caindo com palhaço bobo.", solution: "Boneco ventríloquo no chão solto e o atropelado liso falso parque diversão." },
+    { title: "Morte no Túnel", enigma: "Túnel cego de ponte doida e escura grande. Segura peito, prende nariz liso respirando fundo cego. Sai batendo duro pneu ferro liso no poste gordo concreto solto na vala da rua curva cinza. Briga com volante grosso de ferro de capô longo branco listrado calado da lata furada amarela solta da frente lisa com graxa calada mole gorda cheia no óleo grosso solto no tubo solto fino da calota solta preta na terra seca verde do asfalto derretido quente sujo cego mole liso.", solution: "Superstição infantil prende respiração morre asfixiado falta ar desmaia." },
+    { title: "Pintura que Sangra", enigma: "Limpa poeira quadro liso e escorre vermelho dedo, esconde e deita cego pra morrer veneno forte podre no sangue roxo pulso de bicho doido na artéria da mão grossa feia fedendo com bolha clara fina e gosma de espinha mole dura sem pelo cego de osso duro de cartilagem quebrada no dedinho grosso amarelo com pus mole liso.", solution: "Tinta centenária arsênio veneno cego puro tela." },
+    { title: "Som de Piano", enigma: "Teclado dedilha afina bate martelo corda forte, tiro da janela, cego deita pescoço buraco limpo roxo de sangue fino escorrendo na camisa branca de babado fino cego no ombro mole rasgado da agulha de prata de metal puro caro liso de broche pontudo no tapete felpudo persa antigo vermelho manchado cego sujo do pó de madeira de verniz puro fedido no frasco grosso de vidro liso mole da ponta afiada cega mole gorda.", solution: "Corda tensa estourou piano ricocheteando como chumbo na força do chicote fatal no afinador." },
+    { title: "Garrafa Vazia", enigma: "Deserto cego, seca sol, bate no gargalo duro espatifado liso no ombro quebra, morre seco cortado rindo feliz, bota quente sol escalda na pele da areia fina branca amarela cega do monte duna morro fundo raso de osso cego da carcaça do camelo falso cego de formiga mole miúda preta vermelha picando. Gargalhando.", solution: "Lambia gota final vidro cortou jugular cego desespero puro rindo do frescor letal limpo da gota." },
+    { title: "Carimbo Letal", enigma: "Atestados óbito carimbo mata tinta molhada boca, cento folhas na escrivaninha cinza. Morre ele rindo roxo gordo do coração parado no susto da asfixia lenta babando frouxo branco cego na ponta da língua da bochecha cega torta cega limpa mole lisa sem dente falso amarelo esburacado fedido bafo puro.", solution: "Sabotagem cianeto almofada carimbo. Lambe dedo pra virar página letal fina absorve cego de tanto morder polegar." },
+    { title: "O Homem no Porta-Malas", enigma: "Mala fechada sem tranca chave de carro parado morto sucata cega poeira enferrujada sol e contador dentro abafado assado no lixo ferro cego do volante arrancado pneu careca roubado limpo sem motor cabo grosso arrancado óleo vazado cinza do cheiro ruim morte e osso cego liso rato gordo marrom andando devagar miando fugindo do bicho da noite.", solution: "Escondeu susto no cofre de porta malas enguiçado e calor verão asfixiou liso sem botão destrava." },
+    { title: "Neve Quente", enigma: "Neve branca pura, sapato sola pisa bota queima pele derrete fumaça sobe quimica buraco. Choviscando leve e fumaça sem fogo cego de lenha na calçada liso limpo no meio da estrada de asfalto preto da noite calada sem luz no poste cego solto fio amarelo frouxo estourado faísca de grito do passarinho verde solto sem rabo sem asa caindo devagar cego de fome duro fino sujo e liso calado morto cego no ninho solto do cano do esgoto fedido da lama gorda de sabão mole limpo. Grita louco calado fina e morre duro seco.", solution: "Cal virgem no chão reage e ferve chovendo." },
+    { title: "Café Inofensivo", enigma: "Dois mafioso café escuro copo liso branco xícara fina, poeira açúcar derramada colher bate mexe limpo no buraco cego de bico fino do pó forte coado sem canela e leite pardo sujo grosso no dedo com anel e bracelete prata de bicheiro na cadeira de madeira quebrada encardida de graxa da oficina mecânica na rua solta de areia grossa. Um tomba de olho revirado limpo liso seco. Dono ri. Nenhuma bala tiro corda buraco fresta ar condicionado solto veneno rato da rua do mato da horta cega do vaso verde flor murcha preta podre amarela liso clara fina dura grossa cega sem som sem faro de veneno.", solution: "Diabético de pico sem remédio morre cego e capanga serviu pra quebrar ele açúcar letal bomba relógio da veia entupida fina fraca lisa molhada do suor pardo frio de morte." },
+    { title: "Livro Assassino", enigma: "Livro conde puxa, cai pescoço quebra ombro mole rola espatifa espinha osso calado branco na escada carpete pardo liso duro encardido de chiclete colado preto no chinelo grosso cego mole do mendigo rindo da janela fina rachada vidro na beira do degrau liso encerado brilhando verniz sujo grosso de bota bico largo chumbo aço bico. Velho morre calado na biblioteca.", solution: "Livro falso peso cofre ouro desequilibra e capota no andar." },
+    { title: "Guarda-Chuva Envenenado", enigma: "Sopra tubo fina bala de ponta de acrílico pontiaguda venenosa do veneno escorpião. Velho cego na banca revista foge ônibus busão diesel fumando liso forte na rua solta. Espião assassino de sobretudo tosse veneno da própria bala de veneno puro no bico. Vento de folha seca do buraco calado no esgoto sujo mole cheiro." solution: "Atira contra o vendaval de furacão reverso cego espirrando pó na própria cara e o véio tava na guarita de vidro imune blindado rindo liso do buraco fedido mole do escapamento." },
+    { title: "Óculos Fatais", enigma: "Luneta inverte e cano liso preto silenciado limpo liso do rifle duro gordo amadeirado claro. Espelho muro cego parede liso e o buraco de tiro fura coco do cérebro na careca espirrando cego de osso claro frouxo sem capacete mole liso da capa fina no encosto de madeira da cadeira redonda que gira com o pé de mola limpo.", solution: "Atira no reflexo espelho inverte a mira enganado de ótica noite." },
+    { title: "Perfume Estragado", enigma: "Frufru perfume fede doce flor no pescoço na pele da velha coroca e infarto para coração no salão na festa sem canapé sem ponche. Corda não e faca longe cega falsa flor flor de lixo plástico fino duro no buquê solto da mesa branca da noiva rica calada loira de vestido caro liso arrastando fita solta.", solution: "Perfume reage na prata e cria substancia venenosa fulminante fatal na inalação choque." },
+    { title: "O Mergulho Cego", enigma: "Nada no salva vidas idoso que gritou fundo raso afogou na beira. Pula fundo quebra coco limpo na beira pedra na testa rachada no coral duro osso pontudo roxo furando fêmur coxa carne pele músculo duro fino da prancha liso.", solution: "Recife de pedra barreira escondida na baixa maré, pulo cego destrói a coluna d'água falsa." },
+    { title: "Relógio Atrasado", enigma: "Cuco relógio bomba na gangue cega explodiu antes fumaça preta poeira no osso pedaço voando na cortina clara solta janela rasgada da explosão do estrondo surdo ensurdecedor da rua escura sem luz do poste do carro fusca da época de lata fina da lataria amassada do fogo. Adiantou sem fuso.", solution: "Pássaro de rua bateu sem querer caixa cuco adiantou ativação." },
+    { title: "Sabonete Escorregadio", enigma: "Escorrega banho limpo janela fora voando ar cai vizinho quebra da velocidade rápida cego liso piso. Calado do mato da galinha fugindo de susto e o gato do lado de telha e do fio liso escuro da fresta grossa fina da água.", solution: "Graxa de fábrica esteira atira corpo na fábrica." },
+    { title: "Cofre Submerso", enigma: "Mumificado cego no cofre aberto da agua mar morto afunda do bloco cego sal sem peixe limpo seco duro rindo da bochecha rasgada do osso liso sem cabelo fina pele pergaminho ressecado limpo puro seco.", solution: "Mar morto sal seca desidrata e empalha corpo fundo sem peixe no mar liso forte azul claro na pedra grossa branca seca liso duro fina gorda sem concha mole liso sujo amargo da beira do mato liso." },
+    { title: "Gato Assassino", enigma: "Quarto gato morde liso liso, véio cirurgia caseira bala chumbo coxa mole sangra e o bisturi fura bucho fatal liso de arranhão. Gato pulou ileso puro da pata fofa limpa macia amarela preta.", solution: "Gato pulou em luz refletindo espanto da operação e véio cravou liso fina com susto forte." },
+    { title: "Luvas de Couro", enigma: "Luvas moto pisa enforca de cego cadeirante. Cadeira forte veloz foge da moto cega fina com pneu forte batendo a bengala do idoso que fugiu limpo de rastro da lama de sangue cego fino limpo liso do escape quente solto na rua cega cega. Homem caiu enrolado pescoço morto no meio da rua do solto do galho de folha raso do buraco pardo amarelado.", solution: "Luva engasgou roda aro e puxou estrangulador pra baixo fatal liso força inércia motor idoso joy." },
+    { title: "Bala Fria", enigma: "Engole bebe buraco garganta coração vara furo detetive e morre no frio copo sangue limpo agua cego poça mesa madeira derrete gelo. Chumbo na barriga, laudo aponta, sumiu fresta cega.", solution: "Gelo seco ou nitro derrete rastro da ponta fatal." },
+    { title: "Cigarro Salva-Vidas", enigma: "Fumante bate janela estilhaça fumaça, acorda e ri vivo do fogo longe da faísca viva solta poeira de oxigênio de botijão verde. Corre e vive salva povo idoso do hospital. Limpo.", solution: "Explosão minúscula alerta gás massivo letal antes do asfixiamento, salvando todo mundo evacuação limpa veloz calada de fumaça frouxa liso." },
+    { title: "Sombra Enforcada", enigma: "Cerveja bebe ri da sombra, a sombra no pescoço cai da corda grossa. Não morreu o idoso rindo limpo da cara do fantasma irreal do tijolo cego e duro vermelho.", solution: "Irmão Gêmeo assassino disfarçado no escuro tropeçou de surpresa de costas laçando pescoço alçapão holofote cego projetando da escuridão do porão na tábua da teia limpa de parede na trave da calçada lisa cega surda calada do sino." },
+    { title: "As Cinzas Falsas", enigma: "Lancha vento chora pó branco de defunto urna cerâmica abre pote raso com água suja gota do nariz espirra forte fina fina da cara morta viúva explode na fumaça preta de osso na lata pura liso.", solution: "Dinamite pó plástica mista, umidade espirro fatal detonação instantânea falsa cega fina." }
+];
 
-    let state = { currentIndex: -1, isShowingSolution: false };
+    let state = { currentIndex: 0, isShowingSolution: false };
 
-    const textEl = document.getElementById('tv-text');
-    const badgeEl = document.getElementById('tv-badge');
-    const noiseEl = document.getElementById('static-noise');
-    const instructionEl = document.getElementById('tv-instruction');
-
-    function toggleScreen() {
-        if(state.currentIndex === -1) return;
-        
-        noiseEl.classList.add('active'); 
-        
-        setTimeout(() => {
-            state.isShowingSolution = !state.isShowingSolution;
-            renderContent();
-            noiseEl.classList.remove('active');
-        }, 120); 
+    function initHub() {
+        const list = document.getElementById('hub-list');
+        database.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'hub-item';
+            div.innerHTML = `<div>${(index+1).toString().padStart(2,'0')} - ${item.title}</div>`;
+            div.onclick = () => { state.currentIndex = index; state.isShowingSolution = false; renderContent(); toggleHub(); };
+            list.appendChild(div);
+        });
     }
 
-    function promptNextCard() {
-        if (confirm("Mudar de canal e ver o próximo mistério?")) {
-            noiseEl.classList.add('active');
-            setTimeout(() => {
-                state.isShowingSolution = false;
-                pickRandomCard();
-                noiseEl.classList.remove('active');
-            }, 120);
-        }
-    }
-
-    function pickRandomCard() {
-        let newIndex = state.currentIndex;
-        while(newIndex === state.currentIndex) {
-            newIndex = Math.floor(Math.random() * database.length);
-        }
-        state.currentIndex = newIndex;
-        renderContent();
-        save();
-    }
+    function toggleHub() { document.getElementById('hub-screen').classList.toggle('active'); }
+    function toggleScreen() { state.isShowingSolution = !state.isShowingSolution; renderContent(); }
 
     function renderContent() {
-        if(state.currentIndex === -1) { pickRandomCard(); return; }
-        
         const data = database[state.currentIndex];
-        const caseNum = (state.currentIndex + 1).toString().padStart(2, '0');
-        
-        if (!state.isShowingSolution) {
-            badgeEl.innerText = `MISTÉRIO #${caseNum}`;
-            textEl.innerText = data.enigma;
-            instructionEl.innerText = "Toque na tela para a verdade";
-            textEl.style.color = "var(--text-glow)"; // Brilho total
-        } else {
-            badgeEl.innerText = `SOLUÇÃO #${caseNum}`;
-            textEl.innerText = data.solution;
-            instructionEl.innerText = "Toque na tela para retornar";
-            textEl.style.color = "#a0a0a0"; // Mais opaco na resposta para diferenciar
-        }
+        document.getElementById('tv-badge').innerText = state.isShowingSolution ? "SOLUÇÃO" : "MISTÉRIO";
+        document.getElementById('tv-text').innerText = state.isShowingSolution ? data.solution : data.enigma;
     }
 
-    function save() { localStorage.setItem('mystery_tv_dark_v1', JSON.stringify(state)); }
-    function load() {
-        let saved = localStorage.getItem('mystery_tv_dark_v1');
-        if (saved) {
-            state = JSON.parse(saved);
-            renderContent();
-        } else {
-            pickRandomCard();
-        }
-    }
-
-    window.onload = load;
+    initHub();
+    renderContent();
 </script>
 </body>
 </html>
