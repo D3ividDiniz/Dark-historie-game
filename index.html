@@ -40,6 +40,71 @@
         }
         .hub-link:active { background: #333; color: #fff; }
 
+        .archive-open {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(20,20,20,0.92);
+            border: 1px solid #4d3b1d; padding: 10px 15px; border-radius: 4px;
+            color: var(--text-glow); font-weight: bold; font-size: 12px;
+            z-index: 50; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+        }
+        .archive-open:active { background: #2a2114; transform: scale(0.98); }
+
+        .archive-modal {
+            display: none; position: fixed; inset: 0; z-index: 100;
+            background: radial-gradient(circle at center, #101010 0%, #000 72%);
+            color: #ddd; padding: 20px; overflow: hidden;
+        }
+        .archive-modal.active { display: flex; flex-direction: column; }
+        .archive-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            border-bottom: 1px solid #2d2619; padding-bottom: 14px; margin-bottom: 14px;
+        }
+        .archive-title {
+            color: var(--text-glow); font-size: clamp(18px, 5vw, 30px);
+            text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(230,194,122,0.35);
+        }
+        .archive-close {
+            background: #1a1a1a; color: #aaa; border: 1px solid #333;
+            padding: 10px 12px; border-radius: 4px; font-weight: bold;
+            text-transform: uppercase; cursor: pointer;
+        }
+        .archive-tools {
+            display: grid; grid-template-columns: 1fr auto; gap: 10px;
+            align-items: center; margin-bottom: 14px;
+        }
+        .archive-search {
+            width: 100%; background: #050505; color: var(--text-glow);
+            border: 1px solid #3a301d; border-radius: 4px; padding: 13px;
+            font-size: 15px; outline: none;
+        }
+        .archive-toggle {
+            display: flex; align-items: center; gap: 8px; color: #888;
+            font-size: 12px; text-transform: uppercase; white-space: nowrap;
+        }
+        .archive-list {
+            flex: 1; overflow-y: auto; display: grid; gap: 10px; padding-right: 4px;
+        }
+        .archive-file {
+            width: 100%; text-align: left; background: linear-gradient(135deg, #101010, #050505);
+            border: 1px solid #282018; border-left: 4px solid #59421f;
+            color: #ddd; padding: 13px; border-radius: 5px; cursor: pointer;
+        }
+        .archive-file:active { transform: scale(0.99); background: #16120c; }
+        .archive-file-title {
+            display: flex; justify-content: space-between; gap: 10px;
+            color: var(--text-glow); font-weight: bold; margin-bottom: 7px;
+            text-transform: uppercase;
+        }
+        .archive-file-title span:last-child { color: #777; white-space: nowrap; }
+        .archive-file-preview {
+            color: #aaa; font-size: 13px; line-height: 1.35;
+        }
+        .archive-empty {
+            border: 1px dashed #333; color: #777; padding: 20px; text-align: center;
+            text-transform: uppercase;
+        }
+
         /* === MODELO DA TV DARK === */
         .tv-model {
             position: relative; width: 95vw; max-width: 550px; aspect-ratio: 4 / 3.2;
@@ -140,11 +205,39 @@
 
         /* SCROLLBAR OCULTA NO TV */
         #tv-content::-webkit-scrollbar { display: none; }
+
+        @media (max-width: 620px) {
+            .hub-link, .archive-open { top: 10px; padding: 9px 10px; font-size: 10px; }
+            .hub-link { left: 10px; }
+            .archive-open { right: 10px; }
+            .archive-tools { grid-template-columns: 1fr; }
+            .archive-toggle { justify-content: flex-start; }
+            .archive-modal { padding: 14px; }
+        }
     </style>
 </head>
 <body>
 
 <a href="https://festa-1920.onrender.com/" class="hub-link">← Voltar ao Hub</a>
+<button class="archive-open" onclick="openArchive()">Arquivo Dark</button>
+
+<div class="archive-modal" id="archive-modal" aria-hidden="true">
+    <div class="archive-header">
+        <div>
+            <div class="archive-title">Arquivo Confidencial</div>
+            <div id="archive-count" style="color:#777; font-size:12px; text-transform:uppercase; margin-top:4px;">0 casos catalogados</div>
+        </div>
+        <button class="archive-close" onclick="closeArchive()">Voltar para TV</button>
+    </div>
+    <div class="archive-tools">
+        <input class="archive-search" id="archive-search" type="search" placeholder="Buscar por titulo, pista ou solucao..." oninput="renderArchiveList(this.value)">
+        <label class="archive-toggle">
+            <input type="checkbox" id="archive-show-solutions" onchange="renderArchiveList(document.getElementById('archive-search').value)">
+            Mostrar solucoes
+        </label>
+    </div>
+    <div class="archive-list" id="archive-list"></div>
+</div>
 
 <div class="tv-model">
     <div class="tv-screen-bezel">
@@ -316,6 +409,11 @@
     const badgeEl = document.getElementById('tv-badge');
     const noiseEl = document.getElementById('static-noise');
     const instructionEl = document.getElementById('tv-instruction');
+    const archiveModalEl = document.getElementById('archive-modal');
+    const archiveListEl = document.getElementById('archive-list');
+    const archiveCountEl = document.getElementById('archive-count');
+    const archiveSearchEl = document.getElementById('archive-search');
+    const archiveShowSolutionsEl = document.getElementById('archive-show-solutions');
 
     function toggleScreen() {
         if(state.currentIndex === -1) return;
@@ -350,6 +448,69 @@
         save();
     }
 
+    function openArchive() {
+        renderArchiveList(archiveSearchEl.value);
+        archiveModalEl.classList.add('active');
+        archiveModalEl.setAttribute('aria-hidden', 'false');
+        archiveSearchEl.focus();
+    }
+
+    function closeArchive() {
+        archiveModalEl.classList.remove('active');
+        archiveModalEl.setAttribute('aria-hidden', 'true');
+    }
+
+    function normalizeText(value) {
+        return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
+
+    function renderArchiveList(filterText = '') {
+        const query = normalizeText(filterText);
+        const showSolutions = archiveShowSolutionsEl.checked;
+        const matches = database
+            .map((item, index) => ({ item, index }))
+            .filter(({ item }) => {
+                const searchable = normalizeText(`${item.title} ${item.enigma} ${item.solution}`);
+                return searchable.includes(query);
+            });
+
+        archiveCountEl.innerText = `${matches.length} de ${database.length} casos catalogados`;
+
+        if (!matches.length) {
+            archiveListEl.innerHTML = '<div class="archive-empty">Nenhum arquivo encontrado</div>';
+            return;
+        }
+
+        archiveListEl.innerHTML = matches.map(({ item, index }) => {
+            const caseNum = (index + 1).toString().padStart(2, '0');
+            const preview = showSolutions ? item.solution : item.enigma;
+            const label = showSolutions ? 'SOLUCAO' : 'MISTERIO';
+
+            return `
+                <button class="archive-file" onclick="loadStoryFromArchive(${index})">
+                    <div class="archive-file-title">
+                        <span>${item.title}</span>
+                        <span>#${caseNum}</span>
+                    </div>
+                    <div class="archive-file-preview">${label}: ${preview}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function loadStoryFromArchive(index) {
+        state.currentIndex = index;
+        state.isShowingSolution = false;
+        noiseEl.classList.add('active');
+        closeArchive();
+
+        setTimeout(() => {
+            renderContent();
+            save();
+            noiseEl.classList.remove('active');
+        }, 120);
+    }
+
     function renderContent() {
         if(state.currentIndex === -1) { pickRandomCard(); return; }
         
@@ -380,7 +541,16 @@
         }
     }
 
-    window.onload = load;
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && archiveModalEl.classList.contains('active')) {
+            closeArchive();
+        }
+    });
+
+    window.onload = function() {
+        load();
+        renderArchiveList();
+    };
 </script>
 </body>
 </html>
