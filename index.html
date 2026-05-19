@@ -3,196 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Arquivo Confidencial #01 - Noir Mystery TV</title>
+    <title>Arquivo Confidencial - Noir TV</title>
     
-    <meta name="theme-color" content="#1a1a1a"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="color-scheme" content="dark"> <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="dark">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* === PALETA AMBIENTE NOIR E TEXTURAS REALISTAS === */
+        /* === PALETA DARK NOIR (CRUA E LEGÍVEL) === */
         :root {
-            --desk-bg: #1a1a1a; /* Mahogany/Noir escurecido */
-            --desk-textured: #2c1a12;
-            --tv-casing: #3a1e0b; /* Bakelite casing */
-            --metal-chrome: #ccc;
-            --screen-amber: #f8c255; /* Fósforo âmbar em luminescência */
-            --text-ink: #2b1706; /* Tinta marrom escuro nas placas */
-            --paper: #eee;
+            --bg-pure: #000000;
+            --tv-casing: #140a05; /* Madeira quase negra */
+            --metal-chrome: #555;
+            --screen-dark: #0a0a0a; /* Fundo da tela CRT escuro */
+            --text-glow: #e6c27a; /* Texto brilhante alto contraste */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier Prime', monospace; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--desk-bg);
-            background-image: linear-gradient(to bottom, #111 0%, #000 60%, var(--desk-textured) 60%, #000 100%);
+            background-color: var(--bg-pure);
             display: flex; justify-content: center; align-items: center;
             height: 100vh; overflow: hidden; position: relative;
         }
 
-        /* Iluminação ambiente vinda da TV (Garante escuridão total nos cantos do sistema) */
-        .ambient-glow {
-            position: absolute; top: 50%; left: 50%;
-            width: 100vw; height: 100vh;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(ellipse at center, rgba(231, 111, 81, 0.08) 0%, transparent 80%);
-            pointer-events: none; z-index: 1;
+        /* === LINK DO HUB === */
+        .hub-link {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(20,20,20,0.9);
+            border: 1px solid #333; padding: 10px 15px; border-radius: 4px;
+            color: #888; font-weight: bold; font-size: 12px; text-decoration: none;
+            z-index: 50; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
         }
+        .hub-link:active { background: #333; color: #fff; }
 
-        /* === MODELO DA TV HYPER-REALISTA (3D SKEUOMORPHISM) === */
+        /* === MODELO DA TV DARK === */
         .tv-model {
-            position: relative;
-            width: 95vw; max-width: 550px;
-            aspect-ratio: 4 / 3;
-            background: linear-gradient(135deg, var(--tv-casing) 0%, #111 100%);
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 
-                0 30px 40px rgba(0,0,0,0.8), 
-                0 10px 20px rgba(0,0,0,0.6),
-                inset 2px 2px 3px rgba(255,255,255,0.1),
-                inset -5px -5px 15px rgba(0,0,0,0.8);
-            display: flex; gap: 15px;
-            z-index: 10;
+            position: relative; width: 95vw; max-width: 550px; aspect-ratio: 4 / 3.2;
+            background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);
+            border-radius: 12px; padding: 15px;
+            box-shadow: 0 0 50px rgba(0,0,0,1), inset 2px 2px 3px rgba(255,255,255,0.05);
+            display: flex; gap: 15px; z-index: 10;
         }
 
-        /* Antenas Rabbit-Ear Metalizadas */
+        /* Antenas */
         .tv-model::before {
-            content: ''; position: absolute; top: -50px; left: 30%;
-            width: 4px; height: 70px; background: var(--metal-chrome);
+            content: ''; position: absolute; top: -40px; left: 30%;
+            width: 4px; height: 60px; background: var(--metal-chrome);
             transform: rotate(-30deg); z-index: -1;
-            box-shadow: 50px 10px 0 var(--metal-chrome);
         }
 
-        /* Moldura de plástico escuro ao redor da tela */
+        /* Moldura Frontal */
         .tv-screen-bezel {
-            flex: 1;
-            background: #111;
-            border-radius: 20px 20px 30px 30px;
-            padding: 12px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 1px 1px 2px rgba(255,255,255,0.1);
-            position: relative;
+            flex: 1; background: #080808; border-radius: 20px 20px 30px 30px; padding: 12px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,1); position: relative;
         }
 
-        /* O Vidro Curvo da Tela (CRT) */
+        /* TELA DE VIDRO (DARK + ALTO CONTRASTE) */
         .tv-crt-glass {
             width: 100%; height: 100%;
-            background: radial-gradient(circle at center, var(--screen-amber) 0%, var(--screen-amber-edge) 100%);
-            border-radius: 25% / 15%; /* Curvatura realista clássica */
-            position: relative; overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.95);
-            cursor: pointer;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            border-radius: 20px / 15px;
+            position: relative; overflow: hidden; cursor: pointer;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 25px 30px;
+            padding: 25px 20px; box-shadow: inset 0 0 40px rgba(0,0,0,1);
         }
 
-        /* Reflexo realista do vidro (3D Skeuomorphism) */
+        /* Reflexo e Scanlines sutis */
         .tv-crt-glass::after {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 40%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%);
             pointer-events: none; z-index: 10;
         }
-        
-        /* Scanlines da TV Antiga */
         .scanlines {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px;
-            pointer-events: none; z-index: 5;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 5;
         }
 
-        /* Efeito Ruído ao trocar */
+        /* Glitch de transição */
         #static-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
             opacity: 0; z-index: 20; pointer-events: none;
-            filter: contrast(200%) brightness(150%);
+            filter: contrast(300%) brightness(100%);
         }
-        #static-noise.active { opacity: 0.6; animation: noiseTwitch 0.1s infinite; }
+        #static-noise.active { opacity: 0.3; animation: noiseTwitch 0.1s infinite; }
         @keyframes noiseTwitch { 0% { background-position: 0 0; } 100% { background-position: 15px 15px; } }
 
-        /* Painel Lateral (Knobs prateados) */
-        .tv-panel {
-            width: 50px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-top: 20px;
-        }
-        .knob {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: radial-gradient(circle at top left, var(--metal-chrome), #666);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.2);
-            position: relative;
-        }
-        .knob::after {
-            content: ''; position: absolute; top: 5px; left: 50%;
-            width: 2px; height: 12px; background: #333; transform: translateX(-50%);
-        }
-        .speaker-grill {
-            flex: 1; width: 30px; margin-top: 10px; margin-bottom: 10px;
-            background: repeating-linear-gradient(to bottom, #111, #111 2px, transparent 2px, transparent 4px);
-            box-shadow: inset 0 0 5px rgba(0,0,0,1);
-        }
-
-        /* === CONTEÚDO DA TELA (RIDDLE) === */
+        /* === TEXTO LEGÍVEL === */
         #tv-content { z-index: 2; width: 100%; max-height: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .badge { font-size: clamp(12px, 3vw, 16px); font-weight: bold; color: var(--text-ink); margin-bottom: 10px; text-transform: uppercase; border-bottom: 2px solid rgba(43,23,6,0.3); padding-bottom: 5px; }
-        .story-text { font-size: clamp(14px, 4vw, 18px); line-height: 1.5; font-weight: bold; color: var(--text-ink); text-shadow: 0 0 2px rgba(43,23,6,0.3); }
-        .instruction { font-size: 10px; margin-top: auto; padding-top: 15px; text-transform: uppercase; font-weight: bold; color: rgba(43,23,6,0.6); animation: pulse 2s infinite alternate; }
+        
+        .badge { 
+            font-size: clamp(12px, 3.5vw, 16px); font-weight: bold; 
+            color: #888; margin-bottom: 15px; text-transform: uppercase; 
+            border-bottom: 1px solid #333; padding-bottom: 5px; 
+        }
+        
+        .story-text { 
+            font-size: clamp(15px, 4.5vw, 19px); line-height: 1.5; font-weight: bold; 
+            color: var(--text-glow); /* Texto Dourado/Âmbar claro no fundo preto */
+            text-shadow: 0 0 8px rgba(230, 194, 122, 0.4); /* Brilho de fósforo suave */
+        }
+        
+        .instruction { 
+            font-size: 10px; margin-top: auto; padding-top: 20px; 
+            text-transform: uppercase; font-weight: bold; color: #555; 
+            animation: pulse 2s infinite alternate; 
+        }
         @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
-        /* === UI FIXAS (PAREDE E MESA) === */
-        
-        /* Top-Left: Ranking (Correção do box desfocado) */
-        .ranking-box {
-            position: absolute; top: 15px; left: 15px; /* integrated into mahogany wall */
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #444; padding: 6px 12px; border-radius: 4px;
-            color: #ccc; font-weight: bold; font-size: 11px; z-index: 50;
-            cursor: pointer; display: flex; align-items: center; gap: 6px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.5);
+        /* Painel Lateral */
+        .tv-panel { width: 45px; display: flex; flex-direction: column; gap: 15px; align-items: center; padding-top: 10px; }
+        .knob {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: radial-gradient(circle at top left, #444, #111);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.1);
+            position: relative;
         }
-        .ranking-box span { font-family: sans-serif; font-weight: normal; }
-
-        /* Bottom-Right: Placa da Carteira (Wallet placeholder) */
-        .wallet-box {
-            position: absolute; bottom: 15px; right: 15px; /* integrated into mahogany desk */
-            background: #2b1706; /* integrated with desk color */
-            border: 2px solid #4a3b32; padding: 10px 18px; border-radius: 4px;
-            color: var(--screen-amber); font-weight: bold; font-size: 11px; z-index: 50;
-            cursor: pointer; display: flex; align-items: center; gap: 6px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
-        }
-
-        /* ELEMENTOS AMBIENTE NA MESA */
-        .glass-drink {
-            position: absolute; bottom: 20px; left: 20px;
-            width: 50px; height: 60px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%);
-            border: 2px solid #555; border-radius: 2px 2px 10px 10px;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(0,0,0,0.4);
-            display: flex; justify-content: center; align-items: center; z-index: 5;
-        }
-        .drink { width: 90%; height: 60%; background: #995c2b; position: absolute; bottom: 4px; border-radius: 0 0 8px 8px; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.4); }
-        .ice-cube { width: 10px; height: 10px; background: #eee; position: absolute; top: 15px; left: 15px; border-radius: 1px; opacity: 0.7; transform: rotate(10deg); box-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
-
-        .map {
-            position: absolute; bottom: 15px; left: 80px;
-            width: 130px; height: 100px;
-            background: #e1d5ba; padding: 10px;
-            border-radius: 2px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.3);
-            border: 1px dashed #a1a1a1;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 5; transform: rotate(-5deg);
-        }
-        .map span { color: #555; font-size: 9px; }
+        .knob::after { content: ''; position: absolute; top: 5px; left: 50%; width: 2px; height: 12px; background: #000; transform: translateX(-50%); }
+        .speaker-grill { flex: 1; width: 25px; margin-top: 10px; margin-bottom: 10px; background: repeating-linear-gradient(to bottom, #050505, #050505 2px, transparent 2px, transparent 4px); }
 
         /* Botão Seta (Drunk-Proof) */
         .btn-next {
-            position: absolute; bottom: 70px; right: 20px;
-            background: rgba(0,0,0,0.8); color: var(--phosphor-white); 
-            border: 2px solid #555;
-            width: 45px; height: 45px; border-radius: 50%;
-            font-size: 20px; cursor: pointer; z-index: 50;
+            position: absolute; bottom: 30px; right: 20px;
+            background: rgba(20,20,20,0.9); color: var(--text-glow); 
+            border: 1px solid #333; width: 50px; height: 50px; border-radius: 50%;
+            font-size: 22px; cursor: pointer; z-index: 50;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8); transition: all 0.1s;
+            transition: all 0.1s;
         }
         .btn-next:active { transform: scale(0.9); background: #333; }
 
@@ -202,9 +143,7 @@
 </head>
 <body>
 
-<div class="ambient-glow"></div>
-
-<div class="ranking-box">i <span>RANKING DETETIVES</span></div>
+<a href="https://festa-1920.onrender.com/" class="hub-link">← Voltar ao Hub</a>
 
 <div class="tv-model">
     <div class="tv-screen-bezel">
@@ -214,8 +153,8 @@
             
             <div id="tv-content">
                 <div class="badge" id="tv-badge">MISTÉRIO #01</div>
-                <div class="story-text" id="tv-text">Aquecendo tubo de imagem...</div>
-                <div class="instruction">Toque na tela</div>
+                <div class="story-text" id="tv-text">Iniciando sistema confidencial...</div>
+                <div class="instruction" id="tv-instruction">Toque na tela</div>
             </div>
         </div>
     </div>
@@ -227,53 +166,69 @@
     </div>
 </div>
 
-<div class="wallet-box">DETETIVE_#042</div>
-
-<div class="glass-drink">
-    <div class="drink"></div>
-    <div class="ice-cube"></div>
-    <div class="ice-cube" style="top:25px; left:25px; transform:rotate(-15deg);"></div>
-</div>
-
-<div class="map">
-    <span>MAPA DO ASILO - SEÇÃO CONFIDENCIAL</span>
-</div>
-
 <button class="btn-next" onclick="promptNextCard()">→</button>
 
 <script>
-    // === BANCO DE DADOS (35 HISTÓRIAS NOIR/PORRADA INTEGRADO) ===
+    // === 35 HISTÓRIAS NOIR/PORRADA (COMPLETO) ===
     const database = [
         { title: "A Conta do Bar", enigma: "O homem entrou no bar e pediu água. O barman apontou uma arma. O homem sorriu e saiu. O que aconteceu?", solution: "O homem estava com soluço terrível. O barman percebeu e sacou a arma para dar um grande susto nele. O susto curou o soluço instantaneamente. Ele agradeceu a 'cura' e saiu feliz." },
         { title: "O Gelo no Asilo", enigma: "Enforcado no teto numa sala trancada, sem móveis. Abaixo dele, apenas uma poça de água.", solution: "Ele subiu em cima de um grande bloco de gelo para colocar a corda. O gelo derreteu, ele morreu enforcado, e o gelo virou poça." },
-        { title: "A Poça Misteriosa", enigma: "Romeu e Julieta foram encontrados mortos no chão do quarto, com cacos de vidro e água ao redor.", solution: "Eram peixes dourados. O vento (ou gato) pulou pela janela aberta e derrubou o aquário, quebrando-o. Os peixes morreram sem água." },
-        // ... (resto das 35 histórias integradas aqui)
+        { title: "A Poça Misteriosa", enigma: "Romeu e Julieta foram encontrados mortos no chão do quarto, com cacos de vidro e água ao redor.", solution: "Eram peixes dourados. O vento (ou um gato) pulou pela janela aberta e derrubou o aquário. Os peixes morreram sem água." },
+        { title: "Dona Maria", enigma: "Morta dentro de uma cabine telefônica com os pulsos cortados. Os vidros quebrados por dentro. Não havia assassino nem facas.", solution: "Estava demonstrando o tamanho do peixe gigante que havia pescado para uma amiga no telefone. Socou os vidros da cabine com as mãos, cortando os pulsos." },
+        { title: "Sopa de Ervilhas", enigma: "Pediu sopa de gaivota no restaurante. Na primeira colherada, foi ao banheiro e deu um tiro na própria cabeça.", solution: "Na guerra, ilhado, disseram que sua esposa morreu e deram 'sopa de gaivota' para ele comer. Ao provar a sopa real, percebeu que o gosto era diferente e que havia comido a própria esposa." },
+        { title: "O Hotel na Mesa", enigma: "Empurrou seu carro até um hotel e percebeu que estava completamente falido.", solution: "Estava jogando Banco Imobiliário (Monopoly). A pecinha dele era o carro, e ele caiu no hotel de outro jogador." },
+        { title: "O Cego Milagroso", enigma: "O velho cego jogava poker. Acabou a força no salão. Ele largou a bengala e correu perfeitamente até a rua.", solution: "Ele nunca foi cego. Usava óculos escuros para espiar cartas. No escuro total, achou que tinha ficado cego de verdade e entrou em pânico." },
+        { title: "Fuga do Anão", enigma: "Entrou no quarto, viu pó de serra no chão e se matou chorando.", solution: "Era um anão de circo ('o menor homem do mundo'). Um rival serrou a ponta da sua bengala. Ao tatear o chão com a bengala curta, achou que estava crescendo e perdendo seu ganha-pão." },
+        { title: "Chá das Cinco", enigma: "Três tomaram a mesma jarra de chá com cianeto. A que bebeu rápido sobreviveu. As que beberam devagar morreram.", solution: "O veneno estava congelado nos cubos de gelo. A que bebeu rápido terminou antes que derretessem. As outras absorveram o veneno." },
+        { title: "Homem do Elevador", enigma: "Mora no 10º andar. Desce pelo elevador. Na volta, vai até o 5º andar e sobe de escada, a menos que chova ou tenha companhia.", solution: "Ele é um anão. Só alcança até o botão do 5º andar. Quando chove, usa o guarda-chuva para alcançar o 10º." },
+        { title: "Rádio Surdo", enigma: "O rádio do quarto estava no volume máximo, mas nenhum vizinho do asilo reclamou.", solution: "O idoso era surdo e dormia com o rádio no máximo apenas para sentir a vibração na cama. Todos os outros moradores da ala eram surdos." },
+        { title: "Herança de Amendoim", enigma: "Bilionário morreu de asfixia. Na sala trancada: o cadáver, um pote vazio de amendoins e um papagaio na gaiola.", solution: "Era alérgico a amendoim e tinha Alzheimer. O papagaio, treinado por um herdeiro, repetia: 'Pode comer, o senhor não tem alergia!'. Ele acreditou." },
+        { title: "Tiro no Pé", enigma: "Sacou seu revólver na festa e atirou no próprio pé. Ninguém ouviu o tiro.", solution: "Sacou uma arminha de espoleta (brinquedo) para assustar um rato. Como tinha gota, ao tentar pisar forte no rato, tropeçou de dor e caiu." },
+        { title: "Banho de Sangue", enigma: "Paredes e banheira respingadas de vermelho brilhante. Ela saiu rindo.", solution: "O registro do chuveiro estourou enquanto ela tingia o cabelo escondida com Henna vermelha. Ela riu do susto que os enfermeiros levaram achando que era sangue." },
+        { title: "A Viagem Mortal", enigma: "Idoso morto no meio de um campo aberto. Ao lado, um pacote nunca aberto.", solution: "O pacote era um paraquedas que falhou durante um salto de avião." },
+        { title: "Pássaro do Cancelamento", enigma: "Encontrado morto segurando o celular. Na tela, apenas um passarinho azul.", solution: "Abriu o Twitter e viu que a hashtag com o seu nome + 'Descanse em Paz' era o assunto mais comentado. O susto de 'descobrir' a própria morte deu um infarto." },
+        { title: "A Queda Invisível", enigma: "Parado no meio da sala vazia, de repente caiu de bunda no chão e quebrou o cóccix.", solution: "Estava usando óculos de Realidade Virtual pela primeira vez. Tentou sentar em uma poltrona que só existia no jogo." },
+        { title: "Palito de Fósforo", enigma: "Idoso nu morto de frio no gelo da Sibéria, segurando um palito de fósforo quebrado.", solution: "Perdiam altitude num balão. Jogaram as roupas fora. Tiraram no palitinho quem pularia para salvar os demais. Ele puxou o palito menor." },
+        { title: "Sapatos Vermelhos", enigma: "Usou sapatos caríssimos no show e morreu perfurada no palco.", solution: "Era assistente de um atirador de facas cego, que mirava pelo som dos velhos saltos de madeira. Os novos sapatos tinham sola de borracha silenciosa." },
+        { title: "O Faroleiro", enigma: "Um alarme ensurdecedor tocou. O velho acordou, sorriu em desespero e atirou na própria cabeça.", solution: "Era faroleiro. Esquecera de acender a luz na neblina. O alarme era a sirene de um navio prestes a bater nas rochas. Ele causou uma tragédia." },
+        { title: "Pacote da Máfia", enigma: "Abriu o pacote, viu um braço decepado, sorriu aliviado e jogou no lixo.", solution: "Num pacto de naufrágio, os sobreviventes amputariam o braço esquerdo para enganar a máfia. O braço recebido provava que seu parceiro cumpriu a dolorosa promessa." },
+        { title: "A Senha Fatal", enigma: "Digita a senha no caixa eletrônico, pega o dinheiro, saca uma arma e mata o senhor atrás dele na fila.", solution: "O teclado não emitiu 'bip', indicando que era um teclado falso sobreposto (chupa-cabra) instalado pelo senhor de trás para clonar cartões." },
+        { title: "Testemunha Ocular", enigma: "O detetive chega e prende o cadeirante pelo assassinato envenenado, sem interrogar ou achar a arma.", solution: "O detetive apenas disse: 'Nossa enfermeira faleceu'. O velho respondeu: 'Juro que não coloquei nada na comida!'. Ele se entregou sem saber." },
+        { title: "Batata Quente", enigma: "Mastigou um pedaço de batata cozida e esfaqueou o colega de quarto.", solution: "O colega trocou a dentadura do idoso por uma idêntica feita de cera. Ao comer a batata quente, a cera derreteu, grudou na garganta e quase o sufocou. Ele se vingou." },
+        { title: "Morte no Cinema", enigma: "A senhora da fila D morreu enforcada no cinema. A pessoa de trás nada fez de propósito.", solution: "Filme 3D de terror. Ao se assustar, jogou-se para trás. Seu cachecol prendeu nas engrenagens da poltrona de trás, enforcando-a quando o vizinho ajustou o assento." },
+        { title: "A Ilha dos Carecas", enigma: "Naufraga em ilha de carecas. Meses depois, é enforcado em corda de cabelos longos.", solution: "Era fabricante de perucas. Roubou os cabelos que os nativos ofereciam no altar sagrado. O vulcão entrou em erupção e o sacrificaram com sua própria obra." },
+        { title: "A Cadeira Vazia", enigma: "Vê a cadeira de rodas do pai vazia e chora de alegria. Ele não foi sequestrado.", solution: "O pai era paraplégico. O filho viu marcas de pés descalços saindo da cadeira até o banheiro. Um milagre aconteceu e o velho andou." },
+        { title: "Bilhete de Loteria", enigma: "Rasgou o bilhete premiado de milhões e morreu em paz com um tiro.", solution: "Refém de sequestradores que o matariam e iriam atrás de sua família com o dinheiro. Destruiu o bilhete para proteger a família e tirar o motivo do crime." },
+        { title: "Partida de Xadrez", enigma: "Move a torre de xadrez. O adversário tem um ataque cardíaco fulminante e morre de medo.", solution: "Eram espiões. O jogo formava código Morse. A jogada significava: 'O café que você bebeu agora estava envenenado'." },
+        { title: "Bife de Fígado", enigma: "No asilo, mastiga um bife, tem crise de riso, perde o ar e desmaia.", solution: "Havia engolido a dentadura com a sopa sem notar. Mastigou o bife com a gengiva e mordeu a própria dentadura presa na carne. O absurdo da situação causou crise de riso fatal." },
+        { title: "Papagaio Silencioso", enigma: "A senhora morreu asfixiada no quarto fechado. O papagaio dela já estava morto no fundo da gaiola.", solution: "Vazamento de monóxido de carbono. O papagaio tem pulmão pequeno e caiu primeiro. Se ela tivesse notado o pássaro morto, saberia do gás." },
+        { title: "O Ladrão Honesto", enigma: "Entregou todo o dinheiro da pensão a um homem mascarado e foi pra casa rindo.", solution: "O mascarado era seu neto congelando na neblina com gorro ninja. O avô esqueceu a senha, e o neto hackeou o caixa por fora para sacar pelo avô." },
+        { title: "Janela Indiscreta", enigma: "Vê a luz do vizinho piscar 3 vezes e liga pra polícia dizendo ser assassinato. Acerta em cheio.", solution: "O vizinho estava sendo enforcado no escuro. Na luta violenta, debateram-se contra o interruptor três vezes antes de morrer." },
+        { title: "Música do Diabo", enigma: "A música do organista cego parou. O padre estava morto no altar sem cortes.", solution: "As portas estavam fechadas pelo frio. Monóxido do gerador tomou a igreja matando o padre. O cego parou de tocar porque também desmaiou." },
+        { title: "A Mala Pesa", enigma: "O velho cego no trem abriu a maleta, jogou a pedra pela janela e chorou em desespero.", solution: "Contrabandista com fundo duplo: uma pedra comum e um diamante bruto. Com a polícia chegando, tentou jogar a pedra comum fora, mas errou de compartimento e jogou a fortuna." }
     ];
 
     let state = { currentIndex: -1, isShowingSolution: false };
 
-    // --- ELEMENTOS ---
     const textEl = document.getElementById('tv-text');
     const badgeEl = document.getElementById('tv-badge');
     const noiseEl = document.getElementById('static-noise');
+    const instructionEl = document.getElementById('tv-instruction');
 
-    // --- LÓGICA DE TRANSIÇÃO TV ---
     function toggleScreen() {
         if(state.currentIndex === -1) return;
         
-        // Efeito TV estática / Chuvisco "frufru"
-        noiseEl.classList.add('active');
+        noiseEl.classList.add('active'); 
         
         setTimeout(() => {
             state.isShowingSolution = !state.isShowingSolution;
             renderContent();
             noiseEl.classList.remove('active');
-        }, 120); // Tempo do "glitch"
+        }, 120); 
     }
 
     function promptNextCard() {
-        // Confirmação nativa (sem som) para evitar erros do detetive drunk-proof
-        if (confirm("Mudar de canal e ver o próximo mistério CONFIDENCIAL?")) {
+        if (confirm("Mudar de canal e ver o próximo mistério?")) {
             noiseEl.classList.add('active');
             setTimeout(() => {
                 state.isShowingSolution = false;
@@ -302,16 +257,19 @@
         if (!state.isShowingSolution) {
             badgeEl.innerText = `MISTÉRIO #${caseNum}`;
             textEl.innerText = data.enigma;
+            instructionEl.innerText = "Toque na tela para a verdade";
+            textEl.style.color = "var(--text-glow)"; // Brilho total
         } else {
             badgeEl.innerText = `SOLUÇÃO #${caseNum}`;
             textEl.innerText = data.solution;
+            instructionEl.innerText = "Toque na tela para retornar";
+            textEl.style.color = "#a0a0a0"; // Mais opaco na resposta para diferenciar
         }
     }
 
-    // --- PERSISTÊNCIA ---
-    function save() { localStorage.setItem('mystery_tv_hyperreal_v1', JSON.stringify(state)); }
+    function save() { localStorage.setItem('mystery_tv_dark_v1', JSON.stringify(state)); }
     function load() {
-        let saved = localStorage.getItem('mystery_tv_hyperreal_v1');
+        let saved = localStorage.getItem('mystery_tv_dark_v1');
         if (saved) {
             state = JSON.parse(saved);
             renderContent();
